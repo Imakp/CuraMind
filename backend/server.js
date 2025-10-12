@@ -1,0 +1,69 @@
+const express = require('express');
+const cors = require('cors');
+const { testConnection, closePool } = require('./config/database');
+require('dotenv').config();
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Health check endpoint
+app.get('/health', async (req, res) => {
+  try {
+    const dbConnected = await testConnection();
+    res.json({
+      status: 'ok',
+      database: dbConnected ? 'connected' : 'disconnected',
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      message: err.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Basic API route
+app.get('/api', (req, res) => {
+  res.json({ message: 'Medication Management API' });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    error: 'Something went wrong!',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('\nShutting down gracefully...');
+  await closePool();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('\nShutting down gracefully...');
+  await closePool();
+  process.exit(0);
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
+});
+
+module.exports = app;
