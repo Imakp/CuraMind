@@ -28,10 +28,22 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// Import routes
+const medicationRoutes = require('./routes/medications');
+const settingsRoutes = require('./routes/settings');
+const notificationRoutes = require('./routes/notifications');
+const scheduleRoutes = require('./routes/schedule');
+
 // Basic API route
 app.get('/api', (req, res) => {
   res.json({ message: 'Medication Management API' });
 });
+
+// API routes
+app.use('/api/medications', medicationRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/schedule', scheduleRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -43,7 +55,7 @@ app.use((err, req, res, next) => {
 });
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
