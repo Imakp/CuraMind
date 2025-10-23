@@ -87,9 +87,8 @@ CREATE TABLE audit_logs (
 );
 
 -- Performance Indexes
--- Index for active medications lookup
-CREATE INDEX idx_medications_active ON medications(start_date, end_date) 
-WHERE end_date IS NULL OR end_date >= CURRENT_DATE;
+-- Index for active medications lookup (removed CURRENT_DATE predicate due to immutability requirement)
+CREATE INDEX idx_medications_active ON medications(start_date, end_date);
 
 -- Index for medication name searches
 CREATE INDEX idx_medications_name ON medications(name);

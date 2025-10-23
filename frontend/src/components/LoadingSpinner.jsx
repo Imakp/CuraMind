@@ -1,29 +1,32 @@
-const LoadingSpinner = ({ 
-  size = 'md', 
-  color = 'blue', 
-  text = '', 
+const LoadingSpinner = ({
+  size = "md",
+  color = "blue",
+  text = "",
   fullScreen = false,
-  overlay = false 
+  overlay = false,
 }) => {
   const sizeClasses = {
-    sm: 'h-4 w-4',
-    md: 'h-8 w-8',
-    lg: 'h-12 w-12',
-    xl: 'h-16 w-16'
-  }
+    sm: "h-4 w-4",
+    md: "h-8 w-8",
+    lg: "h-12 w-12",
+    xl: "h-16 w-16",
+  };
 
   const colorClasses = {
-    blue: 'text-blue-600',
-    gray: 'text-gray-600',
-    green: 'text-green-600',
-    red: 'text-red-600',
-    yellow: 'text-yellow-600',
-    purple: 'text-purple-600',
-    white: 'text-white'
-  }
+    blue: "text-blue-600",
+    gray: "text-gray-600",
+    green: "text-green-600",
+    red: "text-red-600",
+    yellow: "text-yellow-600",
+    purple: "text-purple-600",
+    white: "text-white",
+  };
 
   const spinnerElement = (
-    <div className="flex flex-col items-center justify-center space-y-2">
+    <div
+      className="flex flex-col items-center justify-center space-y-2"
+      data-testid="loading-spinner"
+    >
       <svg
         className={`animate-spin ${sizeClasses[size]} ${colorClasses[color]}`}
         fill="none"
@@ -44,19 +47,17 @@ const LoadingSpinner = ({
         />
       </svg>
       {text && (
-        <p className={`text-sm ${colorClasses[color]} animate-pulse`}>
-          {text}
-        </p>
+        <p className={`text-sm ${colorClasses[color]} animate-pulse`}>{text}</p>
       )}
     </div>
-  )
+  );
 
   if (fullScreen) {
     return (
       <div className="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
         {spinnerElement}
       </div>
-    )
+    );
   }
 
   if (overlay) {
@@ -64,10 +65,10 @@ const LoadingSpinner = ({
       <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
         {spinnerElement}
       </div>
-    )
+    );
   }
 
-  return spinnerElement
-}
+  return spinnerElement;
+};
 
-export default LoadingSpinner
+export default LoadingSpinner;

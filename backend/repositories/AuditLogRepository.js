@@ -28,7 +28,7 @@ class AuditLogRepository {
       ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `;
-    
+
     const values = [
       medicine_id,
       action,
@@ -52,7 +52,7 @@ class AuditLogRepository {
     `;
 
     const result = await query(selectQuery, [id]);
-    
+
     if (result.rows.length === 0) {
       return null;
     }
@@ -105,11 +105,11 @@ class AuditLogRepository {
     }
 
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
-    
+
     // Build ORDER BY clause
     const sortBy = options.sort_by || 'created_at';
     const sortDirection = options.sort_direction === 'asc' ? 'ASC' : 'DESC';
-    
+
     let orderBy = 'ORDER BY al.created_at DESC';
     if (['created_at', 'action', 'quantity_change'].includes(sortBy)) {
       orderBy = `ORDER BY al.${sortBy} ${sortDirection}`;
@@ -121,7 +121,7 @@ class AuditLogRepository {
       paramCount++;
       limitClause = `LIMIT $${paramCount}`;
       values.push(options.limit);
-      
+
       if (options.offset) {
         paramCount++;
         limitClause += ` OFFSET $${paramCount}`;
@@ -139,7 +139,7 @@ class AuditLogRepository {
     `;
 
     const result = await query(selectQuery, values);
-    
+
     return result.rows.map(row => this.formatAuditLog(row));
   }
 
@@ -155,12 +155,12 @@ class AuditLogRepository {
 
   // Find recent audit logs
   async findRecent(limit = 50, medicineId = null) {
-    const options = { 
+    const options = {
       limit,
       sort_by: 'created_at',
       sort_direction: 'desc'
     };
-    
+
     if (medicineId) {
       options.medicine_id = medicineId;
     }
@@ -196,7 +196,7 @@ class AuditLogRepository {
     `;
 
     const result = await query(statsQuery, values);
-    
+
     return {
       total_logs: parseInt(result.rows[0].total_logs),
       dose_given_count: parseInt(result.rows[0].dose_given_count),
@@ -239,7 +239,7 @@ class AuditLogRepository {
     `;
 
     const result = await query(activityQuery, values);
-    
+
     return result.rows.map(row => ({
       date: row.activity_date,
       total_activities: parseInt(row.total_activities),
@@ -267,7 +267,7 @@ class AuditLogRepository {
     `;
 
     const result = await query(complianceQuery, [medicineId, startDate, endDate]);
-    
+
     return result.rows.map(row => ({
       date: row.date,
       doses_taken: parseInt(row.doses_taken),
@@ -282,7 +282,7 @@ class AuditLogRepository {
       WHERE created_at < CURRENT_DATE - INTERVAL '1 day' * $1
       RETURNING *
     `;
-    
+
     const result = await query(deleteQuery, [daysOld]);
     return result.rows.length;
   }
@@ -290,7 +290,7 @@ class AuditLogRepository {
   // Export audit logs to JSON format
   async exportLogs(options = {}) {
     const logs = await this.findAll(options);
-    
+
     return {
       export_date: new Date().toISOString(),
       total_records: logs.length,
@@ -305,30 +305,52 @@ class AuditLogRepository {
       SELECT 
         al.*,
         m.name as medication_name,
-        LAG(CAST(new_values->>'total_tablets' AS NUMERIC)) OVER (ORDER BY created_at) as previous_inventory
+        LAG(CAST(al.new_values->>'total_tablets' AS NUMERIC)) OVER (ORDER BY al.created_at) as previous_inventory
       FROM audit_logs al
       LEFT JOIN medications m ON al.medicine_id = m.id
       WHERE al.medicine_id = $1
-        AND (action = 'INVENTORY_UPDATED' OR action = 'DOSE_GIVEN' OR action = 'CREATED')
-        AND quantity_change IS NOT NULL
+        AND (al.action = 'INVENTORY_UPDATED' OR al.action = 'DOSE_GIVEN' OR al.action = 'CREATED')
+        AND al.quantity_change IS NOT NULL
       ORDER BY al.created_at DESC
       LIMIT $2
     `;
 
     const result = await query(timelineQuery, [medicineId, limit]);
-    
+
     return result.rows.map(row => this.formatAuditLog(row));
   }
 
   // Format audit log for consistent output
   formatAuditLog(row) {
+    let oldValues = null;
+    let newValues = null;
+
+    // Handle JSON parsing safely
+    if (row.old_values) {
+      try {
+        oldValues = typeof row.old_values === 'string' ? JSON.parse(row.old_values) : row.old_values;
+      } catch (e) {
+        console.warn('Failed to parse old_values JSON:', row.old_values);
+        oldValues = row.old_values;
+      }
+    }
+
+    if (row.new_values) {
+      try {
+        newValues = typeof row.new_values === 'string' ? JSON.parse(row.new_values) : row.new_values;
+      } catch (e) {
+        console.warn('Failed to parse new_values JSON:', row.new_values);
+        newValues = row.new_values;
+      }
+    }
+
     return {
       id: row.id,
       medicine_id: row.medicine_id,
       medication_name: row.medication_name || null,
       action: row.action,
-      old_values: row.old_values ? JSON.parse(row.old_values) : null,
-      new_values: row.new_values ? JSON.parse(row.new_values) : null,
+      old_values: oldValues,
+      new_values: newValues,
       quantity_change: row.quantity_change ? parseFloat(row.quantity_change) : null,
       created_at: row.created_at,
       previous_inventory: row.previous_inventory ? parseFloat(row.previous_inventory) : null
@@ -348,7 +370,7 @@ class AuditLogRepository {
   // Log inventory update action (convenience method)
   async logInventoryUpdate(medicineId, oldInventory, newInventory, reason = null) {
     const quantityChange = newInventory - oldInventory;
-    
+
     return await this.create({
       medicine_id: medicineId,
       action: 'INVENTORY_UPDATED',

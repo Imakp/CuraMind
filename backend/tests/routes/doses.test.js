@@ -8,7 +8,8 @@ describe('Dose API Endpoints', () => {
   let testRouteId;
 
   beforeAll(async () => {
-    // Clean up any existing test data
+    // Clean up any existing test data in correct order (child tables first)
+    await pool.query('DELETE FROM audit_logs WHERE medicine_id IN (SELECT id FROM medications WHERE name LIKE $1)', ['Test Dose Medication%']);
     await pool.query('DELETE FROM medicine_doses WHERE medicine_id IN (SELECT id FROM medications WHERE name LIKE $1)', ['Test Dose Medication%']);
     await pool.query('DELETE FROM medications WHERE name LIKE $1', ['Test Dose Medication%']);
     await pool.query('DELETE FROM routes WHERE name LIKE $1', ['Test Dose Route%']);

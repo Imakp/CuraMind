@@ -8,16 +8,16 @@ const notificationRepository = new NotificationRepository();
 router.get('/', async (req, res) => {
   try {
     const filters = {};
-    
+
     // Parse query parameters
     if (req.query.is_read !== undefined) {
       filters.is_read = req.query.is_read === 'true';
     }
-    
+
     if (req.query.type) {
       filters.type = req.query.type;
     }
-    
+
     if (req.query.medicine_id) {
       const medicineId = parseInt(req.query.medicine_id);
       if (!Number.isInteger(medicineId)) {
@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
       }
       filters.medicine_id = medicineId;
     }
-    
+
     if (req.query.limit) {
       const limit = parseInt(req.query.limit);
       if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
@@ -45,9 +45,9 @@ router.get('/', async (req, res) => {
       }
       filters.limit = limit;
     }
-    
+
     const notifications = await notificationRepository.findAll(filters);
-    
+
     res.json({
       data: notifications,
       count: notifications.length,
@@ -69,7 +69,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    
+
     if (!Number.isInteger(id)) {
       return res.status(400).json({
         error: {
@@ -79,9 +79,9 @@ router.get('/:id', async (req, res) => {
         }
       });
     }
-    
+
     const notification = await notificationRepository.findById(id);
-    
+
     if (!notification) {
       return res.status(404).json({
         error: {
@@ -90,7 +90,7 @@ router.get('/:id', async (req, res) => {
         }
       });
     }
-    
+
     res.json({
       data: notification
     });
@@ -110,7 +110,7 @@ router.get('/:id', async (req, res) => {
 router.post('/:id/mark-read', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    
+
     if (!Number.isInteger(id)) {
       return res.status(400).json({
         error: {
@@ -120,9 +120,9 @@ router.post('/:id/mark-read', async (req, res) => {
         }
       });
     }
-    
+
     const notification = await notificationRepository.markAsRead(id);
-    
+
     if (!notification) {
       return res.status(404).json({
         error: {
@@ -131,7 +131,7 @@ router.post('/:id/mark-read', async (req, res) => {
         }
       });
     }
-    
+
     res.json({
       data: notification,
       message: 'Notification marked as read'
@@ -151,13 +151,9 @@ router.post('/:id/mark-read', async (req, res) => {
 // POST /api/notifications/mark-all-read - Mark all notifications as read
 router.post('/mark-all-read', async (req, res) => {
   try {
-    const filters = {};
-    
+    let count = 0;
+
     // Allow filtering which notifications to mark as read
-    if (req.body.type) {
-      filters.type = req.body.type;
-    }
-    
     if (req.body.medicine_id) {
       const medicineId = parseInt(req.body.medicine_id);
       if (!Number.isInteger(medicineId)) {
@@ -169,11 +165,20 @@ router.post('/mark-all-read', async (req, res) => {
           }
         });
       }
-      filters.medicine_id = medicineId;
+
+      const notifications = await notificationRepository.markAllAsReadForMedication(medicineId);
+      count = notifications.length;
+    } else {
+      // Mark all unread notifications as read
+      const unreadNotifications = await notificationRepository.findUnread();
+      const notificationIds = unreadNotifications.map(n => n.id);
+
+      if (notificationIds.length > 0) {
+        await notificationRepository.markMultipleAsRead(notificationIds);
+        count = notificationIds.length;
+      }
     }
-    
-    const count = await notificationRepository.markAllAsRead(filters);
-    
+
     res.json({
       message: `${count} notifications marked as read`,
       count: count
@@ -194,7 +199,7 @@ router.post('/mark-all-read', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    
+
     if (!Number.isInteger(id)) {
       return res.status(400).json({
         error: {
@@ -204,9 +209,9 @@ router.delete('/:id', async (req, res) => {
         }
       });
     }
-    
-    const deleted = await notificationRepository.delete(id);
-    
+
+    const deleted = await notificationRepository.deleteById(id);
+
     if (!deleted) {
       return res.status(404).json({
         error: {
@@ -215,7 +220,7 @@ router.delete('/:id', async (req, res) => {
         }
       });
     }
-    
+
     res.json({
       message: 'Notification deleted successfully'
     });
@@ -234,8 +239,9 @@ router.delete('/:id', async (req, res) => {
 // GET /api/notifications/unread-count - Get count of unread notifications
 router.get('/unread-count', async (req, res) => {
   try {
-    const count = await notificationRepository.getUnreadCount();
-    
+    const unreadNotifications = await notificationRepository.findUnread({ limit: 1000 });
+    const count = unreadNotifications.length;
+
     res.json({
       count: count
     });

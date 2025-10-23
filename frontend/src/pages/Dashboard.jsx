@@ -3,6 +3,7 @@ import DatePicker from "../components/DatePicker";
 import MedicationCard from "../components/MedicationCard";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
+import NotificationBell from "../components/NotificationBell";
 
 const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(
@@ -12,6 +13,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [markingDose, setMarkingDose] = useState(null);
+  const [showQuickActions, setShowQuickActions] = useState(false);
 
   // Fetch daily schedule
   const fetchSchedule = async (date) => {
@@ -77,12 +79,69 @@ const Dashboard = () => {
     setSelectedDate(newDate);
   };
 
+  // Handle inventory update
+  const handleUpdateInventory = (medicationId) => {
+    // For now, prompt for new inventory amount
+    const newAmount = prompt("Enter new tablet count:");
+    if (newAmount && !isNaN(newAmount) && parseFloat(newAmount) >= 0) {
+      updateInventory(medicationId, parseFloat(newAmount));
+    }
+  };
+
+  // Update inventory
+  const updateInventory = async (medicationId, newAmount) => {
+    try {
+      const response = await fetch(
+        `/api/medications/${medicationId}/update-inventory`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            total_tablets: newAmount,
+            reason: "Manual update from dashboard",
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error?.message || "Failed to update inventory");
+      }
+
+      // Refresh schedule to show updated inventory
+      await fetchSchedule(selectedDate);
+    } catch (err) {
+      console.error("Error updating inventory:", err);
+      setError(err.message);
+    }
+  };
+
   // Load schedule when component mounts or date changes
   useEffect(() => {
     if (selectedDate) {
       fetchSchedule(selectedDate);
     }
   }, [selectedDate]);
+
+  // Close quick actions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        showQuickActions &&
+        !event.target.closest(".quick-actions-container")
+      ) {
+        setShowQuickActions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showQuickActions]);
 
   // Format date for display
   const formatDateForDisplay = (dateString) => {
@@ -150,6 +209,9 @@ const Dashboard = () => {
               showTime={true}
               timeOfDay={entry.time_of_day}
               doseAmount={entry.dose_amount}
+              isMarking={
+                markingDose === `${entry.medication_id}-${entry.dose_amount}`
+              }
             />
           ))}
         </div>
@@ -180,7 +242,8 @@ const Dashboard = () => {
               </p>
             </div>
 
-            <div className="mt-4 sm:mt-0 sm:ml-4">
+            <div className="mt-4 sm:mt-0 sm:ml-4 flex items-center space-x-4">
+              <NotificationBell />
               <DatePicker
                 value={selectedDate}
                 onChange={handleDateChange}
@@ -204,9 +267,74 @@ const Dashboard = () => {
           <>
             {/* Schedule Summary */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Daily Summary
-              </h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-0">
+                  Daily Summary
+                </h2>
+
+                {/* Quick Action Buttons */}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => (window.location.href = "/manage")}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                    Add Medication
+                  </button>
+
+                  <button
+                    onClick={() => (window.location.href = "/manage")}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                      />
+                    </svg>
+                    View All
+                  </button>
+
+                  <button
+                    onClick={() => fetchSchedule(selectedDate)}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                    Refresh
+                  </button>
+                </div>
+              </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
@@ -274,7 +402,7 @@ const Dashboard = () => {
                           className="bg-white rounded-md p-4 border border-red-200"
                         >
                           <div className="flex justify-between items-start">
-                            <div>
+                            <div className="flex-1">
                               <h4 className="font-medium text-gray-900">
                                 {entry.medication_name}
                               </h4>
@@ -288,9 +416,32 @@ const Dashboard = () => {
                               </p>
                             </div>
 
-                            <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
-                              Buy Soon
-                            </span>
+                            <div className="flex items-center space-x-2 ml-4">
+                              <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+                                Buy Soon
+                              </span>
+                              <button
+                                onClick={() =>
+                                  handleUpdateInventory(entry.medication_id)
+                                }
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                              >
+                                <svg
+                                  className="w-3 h-3 mr-1"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                  />
+                                </svg>
+                                Update
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -360,6 +511,104 @@ const Dashboard = () => {
             )}
           </>
         )}
+      </div>
+
+      {/* Floating Action Button for Mobile */}
+      <div className="fixed bottom-6 right-6 sm:hidden">
+        <div className="relative quick-actions-container">
+          <button
+            onClick={() => setShowQuickActions(!showQuickActions)}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
+            </svg>
+          </button>
+
+          {/* Quick Actions Menu */}
+          {showQuickActions && (
+            <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-48">
+              <button
+                onClick={() => {
+                  window.location.href = "/manage";
+                  setShowQuickActions(false);
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <svg
+                  className="w-4 h-4 mr-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                Add Medication
+              </button>
+
+              <button
+                onClick={() => {
+                  window.location.href = "/manage";
+                  setShowQuickActions(false);
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <svg
+                  className="w-4 h-4 mr-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                  />
+                </svg>
+                View All Medications
+              </button>
+
+              <button
+                onClick={() => {
+                  fetchSchedule(selectedDate);
+                  setShowQuickActions(false);
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <svg
+                  className="w-4 h-4 mr-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Refresh Schedule
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

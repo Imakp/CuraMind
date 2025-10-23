@@ -3,12 +3,18 @@ require('dotenv').config();
 
 // Database configuration
 const dbConfig = {
-  connectionString: process.env.DATABASE_URL,
+  user: process.env.PGUSER || 'postgres',
+  host: process.env.PGHOST || 'localhost',
+  database: process.env.PGDATABASE || 'medication_management',
+  password: process.env.PGPASSWORD || 'password',
+  port: 5432,
+  ssl: {
+    rejectUnauthorized: false,
+  }
   // Connection pool settings
-  max: 20, // Maximum number of clients in the pool
-  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  // max: 20, // Maximum number of clients in the pool
+  // idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+  // connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
 };
 
 // Create connection pool

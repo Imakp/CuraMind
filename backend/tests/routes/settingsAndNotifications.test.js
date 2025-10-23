@@ -9,7 +9,8 @@ describe('Settings and Notifications API Endpoints', () => {
   let testMedicationId;
 
   beforeAll(async () => {
-    // Clean up any existing test data
+    // Clean up any existing test data in correct order (child tables first)
+    await pool.query('DELETE FROM audit_logs WHERE medicine_id IN (SELECT id FROM medications WHERE name LIKE $1)', ['Test Settings Medication%']);
     await pool.query('DELETE FROM notifications WHERE medicine_id IN (SELECT id FROM medications WHERE name LIKE $1)', ['Test Settings Medication%']);
     await pool.query('DELETE FROM medications WHERE name LIKE $1', ['Test Settings Medication%']);
     await pool.query('DELETE FROM routes WHERE name LIKE $1', ['Test Settings Route%']);
