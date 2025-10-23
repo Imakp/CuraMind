@@ -14,6 +14,7 @@ import Settings from "./pages/Settings";
 import MedicationNew from "./pages/MedicationNew";
 import MedicationEdit from "./pages/MedicationEdit";
 import { AppStateProvider } from "./contexts/AppStateContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { initializeServiceWorker } from "./utils/serviceWorker";
 import dataSynchronizer, { syncConfig } from "./utils/dataSync";
 import { cleanup } from "./utils/localStorage";
@@ -110,44 +111,46 @@ function App() {
 
   return (
     <ErrorBoundary onError={handleError}>
-      <AppStateProvider>
-        <Router>
-          <OfflineIndicator />
+      <ThemeProvider>
+        <AppStateProvider>
+          <Router>
+            <OfflineIndicator />
 
-          {/* Update notification */}
-          {updateAvailable && (
-            <div className="fixed top-0 left-0 right-0 bg-blue-600 text-white p-3 text-center z-50">
-              <span className="mr-4">
-                A new version of the app is available!
-              </span>
-              <button
-                onClick={handleUpdateApp}
-                className="bg-white text-blue-600 px-3 py-1 rounded text-sm font-medium hover:bg-gray-100"
-              >
-                Update Now
-              </button>
-              <button
-                onClick={() => setUpdateAvailable(false)}
-                className="ml-2 text-blue-200 hover:text-white"
-              >
-                ×
-              </button>
-            </div>
-          )}
+            {/* Update notification */}
+            {updateAvailable && (
+              <div className="fixed top-0 left-0 right-0 bg-blue-600 text-white p-3 text-center z-50">
+                <span className="mr-4">
+                  A new version of the app is available!
+                </span>
+                <button
+                  onClick={handleUpdateApp}
+                  className="bg-white text-blue-600 px-3 py-1 rounded text-sm font-medium hover:bg-gray-100"
+                >
+                  Update Now
+                </button>
+                <button
+                  onClick={() => setUpdateAvailable(false)}
+                  className="ml-2 text-blue-200 hover:text-white"
+                >
+                  ×
+                </button>
+              </div>
+            )}
 
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="manage" element={<Manage />} />
-              <Route path="manage/new" element={<MedicationNew />} />
-              <Route path="manage/edit/:id" element={<MedicationEdit />} />
-              <Route path="settings" element={<Settings />} />
-              {/* Catch all route - redirect to dashboard */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
-          </Routes>
-        </Router>
-      </AppStateProvider>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="manage" element={<Manage />} />
+                <Route path="manage/new" element={<MedicationNew />} />
+                <Route path="manage/edit/:id" element={<MedicationEdit />} />
+                <Route path="settings" element={<Settings />} />
+                {/* Catch all route - redirect to dashboard */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Route>
+            </Routes>
+          </Router>
+        </AppStateProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

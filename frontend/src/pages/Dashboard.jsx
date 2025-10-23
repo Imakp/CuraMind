@@ -4,6 +4,23 @@ import MedicationCard from "../components/MedicationCard";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
 import NotificationBell from "../components/NotificationBell";
+import SummaryCard from "../components/ui/SummaryCard";
+import { HeroIcon } from "../components/ui/Icon";
+import { DashboardSkeleton } from "../components/LoadingSkeleton";
+import {
+  SummaryCardStagger,
+  MedicationCardStagger,
+} from "../components/StaggerContainer";
+import {
+  BeakerIcon,
+  ClockIcon,
+  ExclamationTriangleIcon,
+  PlusIcon,
+  ArrowPathIcon,
+  ClipboardDocumentListIcon,
+  CalendarDaysIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/outline";
 
 const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(
@@ -179,20 +196,32 @@ const Dashboard = () => {
     return names[period] || period;
   };
 
-  // Render time period section
+  // Enhanced time period section with better visual separation
   const renderTimePeriod = (period, entries) => {
     if (entries.length === 0) return null;
 
     return (
-      <div key={period} className="mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium mr-3">
-            {entries.length}
-          </span>
-          {getPeriodDisplayName(period)}
-        </h3>
+      <section key={period} className="mb-10">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center">
+              <span className="text-primary-700 dark:text-primary-300 font-bold text-lg">
+                {entries.length}
+              </span>
+            </div>
+            <div>
+              <h3 className="text-heading-4 text-neutral-900 dark:text-neutral-100">
+                {getPeriodDisplayName(period)}
+              </h3>
+              <p className="text-body-small text-neutral-600 dark:text-neutral-400">
+                {entries.length}{" "}
+                {entries.length === 1 ? "medication" : "medications"} scheduled
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <MedicationCardStagger>
           {entries.map((entry) => (
             <MedicationCard
               key={`${entry.medication_id}-${entry.dose_id}`}
@@ -214,49 +243,54 @@ const Dashboard = () => {
               }
             />
           ))}
-        </div>
-      </div>
+        </MedicationCardStagger>
+      </section>
     );
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner />
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+        <header className="bg-gradient-to-r from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 shadow-sm border-b border-neutral-200 dark:border-neutral-700">
+          <div className="layout-container py-8">
+            <DashboardSkeleton />
+          </div>
+        </header>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Medication Schedule
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+      {/* Enhanced Header with Gradient Background */}
+      <header className="bg-gradient-to-r from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 shadow-sm border-b border-neutral-200 dark:border-neutral-700">
+        <div className="layout-container py-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-heading-2 text-neutral-900 dark:text-neutral-100 mb-2">
+                Today's Schedule
               </h1>
-              <p className="mt-1 text-sm text-gray-600">
+              <p className="text-lg text-neutral-600 dark:text-neutral-400">
                 {formatDateForDisplay(selectedDate)}
               </p>
             </div>
 
-            <div className="mt-4 sm:mt-0 sm:ml-4 flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
               <NotificationBell />
               <DatePicker
                 value={selectedDate}
                 onChange={handleDateChange}
                 label="Select Date"
                 placeholder="Choose date"
+                className="min-w-0"
               />
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="layout-container py-8">
         {error && (
           <div className="mb-6">
             <ErrorMessage message={error} />
@@ -265,299 +299,261 @@ const Dashboard = () => {
 
         {schedule && (
           <>
-            {/* Schedule Summary */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-0">
-                  Daily Summary
-                </h2>
-
-                {/* Quick Action Buttons */}
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => (window.location.href = "/manage")}
-                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
-                    Add Medication
-                  </button>
-
-                  <button
-                    onClick={() => (window.location.href = "/manage")}
-                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                      />
-                    </svg>
-                    View All
-                  </button>
-
-                  <button
-                    onClick={() => fetchSchedule(selectedDate)}
-                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                      />
-                    </svg>
-                    Refresh
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {schedule.total_medications}
-                  </div>
-                  <div className="text-sm text-gray-600">Medications</div>
-                </div>
-
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">
-                    {schedule.total_doses}
-                  </div>
-                  <div className="text-sm text-gray-600">Total Doses</div>
-                </div>
-
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-600">
-                    {schedule.skipped_medications?.length || 0}
-                  </div>
-                  <div className="text-sm text-gray-600">Skipped</div>
-                </div>
-
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600">
-                    {schedule.schedule
+            {/* Enhanced Summary Cards with Stagger Animation */}
+            <section className="mb-8">
+              <SummaryCardStagger>
+                <SummaryCard
+                  title="Medications"
+                  value={schedule.total_medications}
+                  icon={<HeroIcon icon={BeakerIcon} size="lg" />}
+                  color="primary"
+                  variant="filled"
+                />
+                <SummaryCard
+                  title="Total Doses"
+                  value={schedule.total_doses}
+                  icon={<HeroIcon icon={ClockIcon} size="lg" />}
+                  color="success"
+                  variant="filled"
+                />
+                <SummaryCard
+                  title="Skipped"
+                  value={schedule.skipped_medications?.length || 0}
+                  icon={<HeroIcon icon={XCircleIcon} size="lg" />}
+                  color="warning"
+                  variant="filled"
+                />
+                <SummaryCard
+                  title="Low Inventory"
+                  value={
+                    schedule.schedule
                       ? Object.values(schedule.schedule)
                           .flat()
                           .filter((entry) => entry.is_low_inventory).length
-                      : 0}
+                      : 0
+                  }
+                  icon={<HeroIcon icon={ExclamationTriangleIcon} size="lg" />}
+                  color="error"
+                  variant="filled"
+                />
+              </SummaryCardStagger>
+            </section>
+
+            {/* Quick Actions Section */}
+            <section className="mb-8">
+              <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <h2 className="text-heading-4 text-neutral-900 dark:text-neutral-100 mb-1">
+                      Quick Actions
+                    </h2>
+                    <p className="text-body-small text-neutral-600 dark:text-neutral-400">
+                      Manage your medications and schedule
+                    </p>
                   </div>
-                  <div className="text-sm text-gray-600">Low Inventory</div>
+
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={() => (window.location.href = "/manage")}
+                      className="btn-base btn-primary btn-sm"
+                    >
+                      <HeroIcon icon={PlusIcon} size="sm" />
+                      Add Medication
+                    </button>
+
+                    <button
+                      onClick={() => (window.location.href = "/manage")}
+                      className="btn-base btn-secondary btn-sm"
+                    >
+                      <HeroIcon icon={ClipboardDocumentListIcon} size="sm" />
+                      View All
+                    </button>
+
+                    <button
+                      onClick={() => fetchSchedule(selectedDate)}
+                      className="btn-base btn-ghost btn-sm"
+                    >
+                      <HeroIcon icon={ArrowPathIcon} size="sm" />
+                      Refresh
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </section>
 
-            {/* Buy Soon Alerts */}
+            {/* Enhanced Buy Soon Alerts */}
             {schedule.schedule &&
               Object.values(schedule.schedule)
                 .flat()
                 .some((entry) => entry.is_low_inventory) && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
-                  <h2 className="text-lg font-semibold text-red-800 mb-4 flex items-center">
-                    <svg
-                      className="w-5 h-5 mr-2"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Buy Soon Alerts
-                  </h2>
+                <section className="mb-8">
+                  <div className="bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-xl p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="flex-shrink-0 w-10 h-10 bg-error-100 dark:bg-error-900/50 rounded-lg flex items-center justify-center">
+                        <HeroIcon
+                          icon={ExclamationTriangleIcon}
+                          size="lg"
+                          color="error"
+                        />
+                      </div>
+                      <div>
+                        <h2 className="text-heading-4 text-error-800 dark:text-error-200">
+                          Low Inventory Alerts
+                        </h2>
+                        <p className="text-body-small text-error-700 dark:text-error-300">
+                          These medications need to be restocked soon
+                        </p>
+                      </div>
+                    </div>
 
-                  <div className="space-y-3">
-                    {Object.values(schedule.schedule)
-                      .flat()
-                      .filter((entry) => entry.is_low_inventory)
-                      .map((entry) => (
-                        <div
-                          key={`${entry.medication_id}-alert`}
-                          className="bg-white rounded-md p-4 border border-red-200"
-                        >
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <h4 className="font-medium text-gray-900">
-                                {entry.medication_name}
-                              </h4>
-                              {entry.medication_strength && (
-                                <p className="text-sm text-gray-600">
-                                  {entry.medication_strength}
+                    <div className="space-y-4">
+                      {Object.values(schedule.schedule)
+                        .flat()
+                        .filter((entry) => entry.is_low_inventory)
+                        .map((entry) => (
+                          <div
+                            key={`${entry.medication_id}-alert`}
+                            className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-error-200 dark:border-error-700 shadow-sm"
+                          >
+                            <div className="flex justify-between items-start gap-4">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
+                                  {entry.medication_name}
+                                </h4>
+                                {entry.medication_strength && (
+                                  <p className="text-body-small text-neutral-600 dark:text-neutral-400 mb-2">
+                                    {entry.medication_strength}
+                                  </p>
+                                )}
+                                <p className="text-body-small text-error-600 dark:text-error-400 font-medium">
+                                  Only {entry.remaining_tablets} tablets
+                                  remaining
                                 </p>
-                              )}
-                              <p className="text-sm text-red-600 mt-1">
-                                Only {entry.remaining_tablets} tablets remaining
-                              </p>
-                            </div>
+                              </div>
 
-                            <div className="flex items-center space-x-2 ml-4">
-                              <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
-                                Buy Soon
-                              </span>
-                              <button
-                                onClick={() =>
-                                  handleUpdateInventory(entry.medication_id)
-                                }
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                              >
-                                <svg
-                                  className="w-3 h-3 mr-1"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
+                              <div className="flex items-center gap-3 flex-shrink-0">
+                                <span className="badge-base badge-error badge-filled badge-sm">
+                                  Buy Soon
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    handleUpdateInventory(entry.medication_id)
+                                  }
+                                  className="btn-base btn-secondary btn-xs"
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                                  />
-                                </svg>
-                                Update
-                              </button>
+                                  <HeroIcon icon={PlusIcon} size="xs" />
+                                  Update
+                                </button>
+                              </div>
                             </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </section>
+              )}
+
+            {/* Enhanced Skipped Medications */}
+            {schedule.skipped_medications &&
+              schedule.skipped_medications.length > 0 && (
+                <section className="mb-8">
+                  <div className="bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-xl p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="flex-shrink-0 w-10 h-10 bg-warning-100 dark:bg-warning-900/50 rounded-lg flex items-center justify-center">
+                        <HeroIcon
+                          icon={XCircleIcon}
+                          size="lg"
+                          color="warning"
+                        />
+                      </div>
+                      <div>
+                        <h2 className="text-heading-4 text-warning-800 dark:text-warning-200">
+                          Skipped Medications
+                        </h2>
+                        <p className="text-body-small text-warning-700 dark:text-warning-300">
+                          Medications that were skipped today
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      {schedule.skipped_medications.map((skipped) => (
+                        <div
+                          key={skipped.id}
+                          className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-warning-200 dark:border-warning-700 shadow-sm"
+                        >
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-neutral-900 dark:text-neutral-100">
+                              {skipped.name}
+                            </span>
+                            <span className="text-body-small text-warning-700 dark:text-warning-300 font-medium">
+                              {skipped.reason}
+                            </span>
                           </div>
                         </div>
                       ))}
+                    </div>
                   </div>
-                </div>
+                </section>
               )}
 
-            {/* Skipped Medications */}
-            {schedule.skipped_medications &&
-              schedule.skipped_medications.length > 0 && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
-                  <h2 className="text-lg font-semibold text-yellow-800 mb-4">
-                    Skipped Medications
-                  </h2>
-
-                  <div className="space-y-2">
-                    {schedule.skipped_medications.map((skipped) => (
-                      <div
-                        key={skipped.id}
-                        className="flex justify-between items-center bg-white rounded-md p-3 border border-yellow-200"
-                      >
-                        <span className="font-medium text-gray-900">
-                          {skipped.name}
-                        </span>
-                        <span className="text-sm text-yellow-700">
-                          {skipped.reason}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            {/* Schedule by Time Periods */}
+            {/* Enhanced Schedule by Time Periods */}
             {schedule.schedule && (
-              <div className="space-y-8">
+              <div className="space-y-10">
                 {Object.entries(schedule.schedule).map(([period, entries]) =>
                   renderTimePeriod(period, entries)
                 )}
               </div>
             )}
 
-            {/* Empty State */}
+            {/* Enhanced Empty State */}
             {schedule.total_doses === 0 && (
-              <div className="text-center py-12">
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-                  />
-                </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">
+              <div className="text-center py-16">
+                <div className="w-20 h-20 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <HeroIcon icon={CalendarDaysIcon} size="2xl" color="muted" />
+                </div>
+                <h3 className="text-heading-4 text-neutral-900 dark:text-neutral-100 mb-2">
                   No medications scheduled
                 </h3>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="text-body text-neutral-600 dark:text-neutral-400 mb-6 max-w-md mx-auto">
                   No medications are scheduled for{" "}
-                  {formatDateForDisplay(selectedDate)}.
+                  {formatDateForDisplay(selectedDate)}. Add medications to get
+                  started.
                 </p>
+                <button
+                  onClick={() => (window.location.href = "/manage")}
+                  className="btn-base btn-primary btn-md"
+                >
+                  <HeroIcon icon={PlusIcon} size="sm" />
+                  Add Your First Medication
+                </button>
               </div>
             )}
           </>
         )}
-      </div>
+      </main>
 
-      {/* Floating Action Button for Mobile */}
-      <div className="fixed bottom-6 right-6 sm:hidden">
+      {/* Enhanced Floating Action Button for Mobile */}
+      <div className="fixed bottom-6 right-6 lg:hidden">
         <div className="relative quick-actions-container">
           <button
             onClick={() => setShowQuickActions(!showQuickActions)}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            className="w-14 h-14 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white rounded-full shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 flex items-center justify-center"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
+            <HeroIcon icon={PlusIcon} size="lg" />
           </button>
 
-          {/* Quick Actions Menu */}
+          {/* Enhanced Quick Actions Menu */}
           {showQuickActions && (
-            <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-48">
+            <div className="absolute bottom-16 right-0 bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 py-2 min-w-56 animate-scale-in">
               <button
                 onClick={() => {
                   window.location.href = "/manage";
                   setShowQuickActions(false);
                 }}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                className="w-full text-left px-4 py-3 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-3 transition-colors"
               >
-                <svg
-                  className="w-4 h-4 mr-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
+                <HeroIcon icon={PlusIcon} size="sm" color="primary" />
                 Add Medication
               </button>
 
@@ -566,21 +562,13 @@ const Dashboard = () => {
                   window.location.href = "/manage";
                   setShowQuickActions(false);
                 }}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                className="w-full text-left px-4 py-3 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-3 transition-colors"
               >
-                <svg
-                  className="w-4 h-4 mr-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                  />
-                </svg>
+                <HeroIcon
+                  icon={ClipboardDocumentListIcon}
+                  size="sm"
+                  color="primary"
+                />
                 View All Medications
               </button>
 
@@ -589,21 +577,9 @@ const Dashboard = () => {
                   fetchSchedule(selectedDate);
                   setShowQuickActions(false);
                 }}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                className="w-full text-left px-4 py-3 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-3 transition-colors"
               >
-                <svg
-                  className="w-4 h-4 mr-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
+                <HeroIcon icon={ArrowPathIcon} size="sm" color="primary" />
                 Refresh Schedule
               </button>
             </div>

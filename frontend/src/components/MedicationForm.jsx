@@ -1,10 +1,22 @@
 import { useState, useEffect } from "react";
+import {
+  BeakerIcon,
+  CalendarDaysIcon,
+  ClockIcon,
+  CubeIcon,
+  DocumentTextIcon,
+  ExclamationCircleIcon,
+  CheckCircleIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { HeroIcon } from "./ui/Icon";
+import Button from "./ui/Button";
+import Input from "./ui/Input";
+import StatusBadge from "./ui/StatusBadge";
 import DoseForm from "./DoseForm";
 import SkipDateCalendar from "./SkipDateCalendar";
 import InventoryTracker from "./InventoryTracker";
 import DatePicker from "./DatePicker";
-import LoadingSpinner from "./LoadingSpinner";
-import ErrorMessage from "./ErrorMessage";
 
 const MedicationForm = ({
   medication = null,
@@ -235,82 +247,88 @@ const MedicationForm = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <LoadingSpinner />
+      <div className="flex flex-col items-center justify-center py-16 space-y-4">
+        <div className="loading-spinner w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          Loading form data...
+        </p>
       </div>
     );
   }
 
   return (
     <div className="max-w-4xl mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8 stagger-container">
         {error && (
-          <ErrorMessage message={error} onDismiss={() => setError("")} />
+          <div className="bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-xl p-4 animate-slide-down">
+            <div className="flex items-start space-x-3">
+              <HeroIcon
+                icon={ExclamationCircleIcon}
+                size="md"
+                className="text-error-500 mt-0.5 flex-shrink-0"
+              />
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-error-800 dark:text-error-200">
+                  Error Saving Medication
+                </h4>
+                <p className="text-sm text-error-700 dark:text-error-300 mt-1">
+                  {error}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setError("")}
+                className="text-error-500 hover:text-error-700 hover:bg-error-100 dark:hover:bg-error-900/30"
+              >
+                <HeroIcon icon={XMarkIcon} size="sm" />
+              </Button>
+            </div>
+          </div>
         )}
 
-        {/* Basic Information */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-6">
-            Basic Information
-          </h3>
+        {/* Enhanced Basic Information */}
+        <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 p-6 hover:shadow-md transition-all duration-200 card-parallax stagger-item">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-xl">
+              <HeroIcon
+                icon={BeakerIcon}
+                size="md"
+                className="text-primary-600 dark:text-primary-400"
+              />
+            </div>
+            <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
+              Basic Information
+            </h3>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Medication Name *
-              </label>
-              <input
-                type="text"
-                id="name"
-                value={formData.name}
-                onChange={(e) => handleFieldChange("name", e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  validationErrors.name ? "border-red-300" : "border-gray-300"
-                }`}
-                placeholder="Enter medication name"
-              />
-              {validationErrors.name && (
-                <p className="mt-1 text-sm text-red-600">
-                  {validationErrors.name}
-                </p>
-              )}
-            </div>
+            <Input
+              label="Medication Name"
+              required
+              value={formData.name}
+              onChange={(e) => handleFieldChange("name", e.target.value)}
+              error={validationErrors.name}
+              placeholder="Enter medication name"
+              leftIcon={<HeroIcon icon={BeakerIcon} size="sm" />}
+            />
 
-            <div>
-              <label
-                htmlFor="strength"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Strength
-              </label>
-              <input
-                type="text"
-                id="strength"
-                value={formData.strength}
-                onChange={(e) => handleFieldChange("strength", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., 100mg, 5ml"
-              />
-            </div>
+            <Input
+              label="Strength"
+              value={formData.strength}
+              onChange={(e) => handleFieldChange("strength", e.target.value)}
+              placeholder="e.g., 100mg, 5ml"
+            />
 
-            <div>
-              <label
-                htmlFor="route_id"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Route *
-              </label>
+            <div className="form-field">
+              <label className="form-label">Route *</label>
               <select
-                id="route_id"
                 value={formData.route_id}
                 onChange={(e) => handleFieldChange("route_id", e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`form-input-base form-input-animated form-input-md w-full ${
                   validationErrors.route_id
-                    ? "border-red-300"
-                    : "border-gray-300"
+                    ? "form-input-error form-error-animated"
+                    : ""
                 }`}
               >
                 <option value="">Select route</option>
@@ -321,29 +339,28 @@ const MedicationForm = ({
                 ))}
               </select>
               {validationErrors.route_id && (
-                <p className="mt-1 text-sm text-red-600">
-                  {validationErrors.route_id}
-                </p>
+                <div className="form-message form-error form-message-animated animate-error">
+                  <HeroIcon
+                    icon={ExclamationCircleIcon}
+                    size="sm"
+                    className="text-error-600 flex-shrink-0"
+                  />
+                  <span>{validationErrors.route_id}</span>
+                </div>
               )}
             </div>
 
-            <div>
-              <label
-                htmlFor="frequency_id"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Frequency *
-              </label>
+            <div className="form-field">
+              <label className="form-label">Frequency *</label>
               <select
-                id="frequency_id"
                 value={formData.frequency_id}
                 onChange={(e) =>
                   handleFieldChange("frequency_id", e.target.value)
                 }
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`form-input-base form-input-animated form-input-md w-full ${
                   validationErrors.frequency_id
-                    ? "border-red-300"
-                    : "border-gray-300"
+                    ? "form-input-error form-error-animated"
+                    : ""
                 }`}
               >
                 <option value="">Select frequency</option>
@@ -354,75 +371,133 @@ const MedicationForm = ({
                 ))}
               </select>
               {validationErrors.frequency_id && (
-                <p className="mt-1 text-sm text-red-600">
-                  {validationErrors.frequency_id}
-                </p>
+                <div className="form-message form-error form-message-animated animate-error">
+                  <HeroIcon
+                    icon={ExclamationCircleIcon}
+                    size="sm"
+                    className="text-error-600 flex-shrink-0"
+                  />
+                  <span>{validationErrors.frequency_id}</span>
+                </div>
               )}
             </div>
 
-            <div>
-              <label
-                htmlFor="start_date"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Start Date *
-              </label>
-              <DatePicker
-                value={formData.start_date}
-                onChange={(date) => handleFieldChange("start_date", date)}
-                className={validationErrors.start_date ? "border-red-300" : ""}
-              />
+            <div className="form-field">
+              <label className="form-label">Start Date *</label>
+              <div className="form-input-container form-field-animated">
+                <div className="form-input-icon form-input-icon-left">
+                  <HeroIcon
+                    icon={CalendarDaysIcon}
+                    size="sm"
+                    className="text-neutral-400"
+                  />
+                </div>
+                <DatePicker
+                  value={formData.start_date}
+                  onChange={(date) => handleFieldChange("start_date", date)}
+                  className={`form-input-base form-input-animated form-input-md form-input-with-icon ${
+                    validationErrors.start_date
+                      ? "form-input-error form-error-animated"
+                      : ""
+                  }`}
+                />
+              </div>
               {validationErrors.start_date && (
-                <p className="mt-1 text-sm text-red-600">
-                  {validationErrors.start_date}
-                </p>
+                <div className="form-message form-error form-message-animated animate-error">
+                  <HeroIcon
+                    icon={ExclamationCircleIcon}
+                    size="sm"
+                    className="text-error-600 flex-shrink-0"
+                  />
+                  <span>{validationErrors.start_date}</span>
+                </div>
               )}
             </div>
 
-            <div>
-              <label
-                htmlFor="end_date"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                End Date (Optional)
-              </label>
-              <DatePicker
-                value={formData.end_date}
-                onChange={(date) => handleFieldChange("end_date", date)}
-                placeholder="Leave empty for ongoing"
-                className={validationErrors.end_date ? "border-red-300" : ""}
-              />
+            <div className="form-field">
+              <label className="form-label">End Date (Optional)</label>
+              <div className="form-input-container form-field-animated">
+                <div className="form-input-icon form-input-icon-left">
+                  <HeroIcon
+                    icon={CalendarDaysIcon}
+                    size="sm"
+                    className="text-neutral-400"
+                  />
+                </div>
+                <DatePicker
+                  value={formData.end_date}
+                  onChange={(date) => handleFieldChange("end_date", date)}
+                  placeholder="Leave empty for ongoing"
+                  className={`form-input-base form-input-animated form-input-md form-input-with-icon ${
+                    validationErrors.end_date
+                      ? "form-input-error form-error-animated"
+                      : ""
+                  }`}
+                />
+              </div>
               {validationErrors.end_date && (
-                <p className="mt-1 text-sm text-red-600">
-                  {validationErrors.end_date}
-                </p>
+                <div className="form-message form-error form-message-animated animate-error">
+                  <HeroIcon
+                    icon={ExclamationCircleIcon}
+                    size="sm"
+                    className="text-error-600 flex-shrink-0"
+                  />
+                  <span>{validationErrors.end_date}</span>
+                </div>
               )}
             </div>
           </div>
 
           <div className="mt-6">
-            <label
-              htmlFor="notes"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Notes
-            </label>
-            <textarea
-              id="notes"
-              rows={3}
-              value={formData.notes}
-              onChange={(e) => handleFieldChange("notes", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Additional notes or instructions"
-            />
+            <div className="form-field">
+              <label className="form-label">Notes</label>
+              <div className="form-input-container form-field-animated">
+                <div
+                  className="form-input-icon form-input-icon-left"
+                  style={{ top: "12px" }}
+                >
+                  <HeroIcon
+                    icon={DocumentTextIcon}
+                    size="sm"
+                    className="text-neutral-400"
+                  />
+                </div>
+                <textarea
+                  rows={3}
+                  value={formData.notes}
+                  onChange={(e) => handleFieldChange("notes", e.target.value)}
+                  className="form-input-base form-input-animated form-input-md form-input-with-icon w-full resize-none"
+                  placeholder="Additional notes or instructions"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Dose Management */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-6">
-            Dose Schedule *
-          </h3>
+        {/* Enhanced Dose Management */}
+        <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 p-6 hover:shadow-md transition-all duration-200 card-parallax stagger-item">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="p-2 bg-info-100 dark:bg-info-900/30 rounded-xl">
+              <HeroIcon
+                icon={ClockIcon}
+                size="md"
+                className="text-info-600 dark:text-info-400"
+              />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
+                Dose Schedule
+              </h3>
+              <StatusBadge
+                status="info"
+                size="sm"
+                variant="soft"
+                className="mt-1"
+              >
+                Required
+              </StatusBadge>
+            </div>
+          </div>
 
           <DoseForm
             doses={doses}
@@ -432,9 +507,25 @@ const MedicationForm = ({
           />
         </div>
 
-        {/* Skip Dates */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-6">Skip Dates</h3>
+        {/* Enhanced Skip Dates */}
+        <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 p-6 hover:shadow-md transition-all duration-200 card-parallax stagger-item">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="p-2 bg-warning-100 dark:bg-warning-900/30 rounded-xl">
+              <HeroIcon
+                icon={CalendarDaysIcon}
+                size="md"
+                className="text-warning-600 dark:text-warning-400"
+              />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
+                Skip Dates
+              </h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+                Select dates when medication should be skipped
+              </p>
+            </div>
+          </div>
 
           <SkipDateCalendar
             selectedDates={skipDates}
@@ -443,13 +534,18 @@ const MedicationForm = ({
             endDate={formData.end_date}
           />
 
-          {/* Duration Display */}
+          {/* Enhanced Duration Display */}
           {formData.start_date && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-md">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-600">Total Days:</span>
-                  <p className="font-medium text-gray-900">
+            <div className="mt-6 p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-xl border border-neutral-200 dark:border-neutral-600">
+              <h4 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 mb-3">
+                Schedule Summary
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="text-center p-3 bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
+                  <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-1">
+                    Total Days
+                  </p>
+                  <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
                     {formData.end_date
                       ? Math.ceil(
                           (new Date(formData.end_date) -
@@ -459,15 +555,19 @@ const MedicationForm = ({
                       : "Ongoing"}
                   </p>
                 </div>
-                <div>
-                  <span className="text-gray-600">Skip Days:</span>
-                  <p className="font-medium text-gray-900">
+                <div className="text-center p-3 bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
+                  <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-1">
+                    Skip Days
+                  </p>
+                  <p className="text-lg font-bold text-warning-600 dark:text-warning-400">
                     {skipDates.length}
                   </p>
                 </div>
-                <div>
-                  <span className="text-gray-600">Active Days:</span>
-                  <p className="font-medium text-gray-900">
+                <div className="text-center p-3 bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
+                  <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-1">
+                    Active Days
+                  </p>
+                  <p className="text-lg font-bold text-success-600 dark:text-success-400">
                     {formData.end_date ? calculateActiveDays() : "Ongoing"}
                   </p>
                 </div>
@@ -476,11 +576,25 @@ const MedicationForm = ({
           )}
         </div>
 
-        {/* Inventory Management */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-6">
-            Inventory Management
-          </h3>
+        {/* Enhanced Inventory Management */}
+        <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 p-6 hover:shadow-md transition-all duration-200 card-parallax stagger-item">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="p-2 bg-success-100 dark:bg-success-900/30 rounded-xl">
+              <HeroIcon
+                icon={CubeIcon}
+                size="md"
+                className="text-success-600 dark:text-success-400"
+              />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
+                Inventory Management
+              </h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+                Track medication stock and sheet sizes
+              </p>
+            </div>
+          </div>
 
           <InventoryTracker
             sheetSize={formData.sheet_size}
@@ -491,28 +605,35 @@ const MedicationForm = ({
           />
         </div>
 
-        {/* Form Actions */}
-        <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-          <button
+        {/* Enhanced Form Actions */}
+        <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-6 border-t border-neutral-200 dark:border-neutral-700 stagger-item">
+          <Button
             type="button"
+            variant="secondary"
+            size="lg"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="sm:order-1"
           >
+            <HeroIcon icon={XMarkIcon} size="sm" className="mr-2" />
             Cancel
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="submit"
+            variant="primary"
+            size="lg"
             disabled={isSubmitting}
-            className="px-6 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            loading={isSubmitting}
+            className="sm:order-2"
           >
+            <HeroIcon icon={CheckCircleIcon} size="sm" className="mr-2" />
             {isSubmitting
               ? "Saving..."
               : medication
               ? "Update Medication"
               : "Create Medication"}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

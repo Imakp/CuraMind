@@ -1,12 +1,15 @@
 import { Outlet } from "react-router-dom";
 import Navigation from "./Navigation";
+import PageTransition from "./PageTransition";
 
 function Layout() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors duration-200">
       <Navigation />
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <Outlet />
+      <main className="layout-container py-responsive">
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
     </div>
   );

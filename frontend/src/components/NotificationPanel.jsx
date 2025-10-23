@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
-import LoadingSpinner from "./LoadingSpinner";
-import ErrorMessage from "./ErrorMessage";
+import {
+  BellIcon,
+  XMarkIcon,
+  ExclamationTriangleIcon,
+  ClockIcon,
+  ExclamationCircleIcon,
+  InformationCircleIcon,
+  ArrowPathIcon,
+} from "@heroicons/react/24/outline";
+import { HeroIcon } from "./ui/Icon";
+import Button from "./ui/Button";
+import StatusBadge from "./ui/StatusBadge";
 
 const NotificationPanel = ({
   isOpen,
@@ -132,72 +142,42 @@ const NotificationPanel = ({
     switch (type) {
       case "BUY_SOON":
         return (
-          <div className="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-4 h-4 text-red-600"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
+          <div className="flex-shrink-0 w-10 h-10 bg-error-100 dark:bg-error-900/30 rounded-xl flex items-center justify-center border border-error-200 dark:border-error-800">
+            <HeroIcon
+              icon={ExclamationTriangleIcon}
+              size="md"
+              className="text-error-600 dark:text-error-400"
+            />
           </div>
         );
       case "DOSE_DUE":
         return (
-          <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-4 h-4 text-blue-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+          <div className="flex-shrink-0 w-10 h-10 bg-info-100 dark:bg-info-900/30 rounded-xl flex items-center justify-center border border-info-200 dark:border-info-800">
+            <HeroIcon
+              icon={ClockIcon}
+              size="md"
+              className="text-info-600 dark:text-info-400"
+            />
           </div>
         );
       case "MISSED_DOSE":
         return (
-          <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-4 h-4 text-orange-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
+          <div className="flex-shrink-0 w-10 h-10 bg-warning-100 dark:bg-warning-900/30 rounded-xl flex items-center justify-center border border-warning-200 dark:border-warning-800">
+            <HeroIcon
+              icon={ExclamationCircleIcon}
+              size="md"
+              className="text-warning-600 dark:text-warning-400"
+            />
           </div>
         );
       default:
         return (
-          <div className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-4 h-4 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+          <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center border border-neutral-200 dark:border-neutral-700">
+            <HeroIcon
+              icon={InformationCircleIcon}
+              size="md"
+              className="text-neutral-600 dark:text-neutral-400"
+            />
           </div>
         );
     }
@@ -251,153 +231,201 @@ const NotificationPanel = ({
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       <div
-        className="absolute inset-0 bg-black bg-opacity-50"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
         onClick={onClose}
       />
 
-      <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl">
+      <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-neutral-800 shadow-2xl border-l border-neutral-200 dark:border-neutral-700 notification-slide-in">
         <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <div className="flex items-center">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Notifications
-              </h2>
-              {unreadCount > 0 && (
-                <span className="ml-2 bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
-                  {unreadCount} unread
-                </span>
-              )}
+          {/* Enhanced Header */}
+          <div className="flex items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-700 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-xl">
+                <HeroIcon
+                  icon={BellIcon}
+                  size="md"
+                  className="text-primary-600 dark:text-primary-400"
+                />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
+                  Notifications
+                </h2>
+                {unreadCount > 0 && (
+                  <StatusBadge
+                    status="error"
+                    size="sm"
+                    variant="soft"
+                    className="mt-1"
+                  >
+                    {unreadCount} unread
+                  </StatusBadge>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center space-x-2">
               {unreadCount > 0 && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={markAllAsRead}
                   disabled={loading}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50"
+                  className="text-primary-600 hover:text-primary-700 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/30"
                 >
                   Mark all read
-                </button>
+                </Button>
               )}
 
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-700"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                <HeroIcon icon={XMarkIcon} size="md" />
+              </Button>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto">
+          {/* Enhanced Content */}
+          <div className="flex-1 overflow-y-auto bg-neutral-50 dark:bg-neutral-900">
             {loading && (
-              <div className="flex items-center justify-center p-8">
-                <LoadingSpinner />
+              <div className="flex flex-col items-center justify-center p-12 space-y-4">
+                <div className="loading-spinner w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                  Loading notifications...
+                </p>
               </div>
             )}
 
             {error && (
-              <div className="p-4">
-                <ErrorMessage message={error} />
-                <button
-                  onClick={fetchNotifications}
-                  className="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  Try again
-                </button>
+              <div className="p-6">
+                <div className="bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-xl p-4">
+                  <div className="flex items-start space-x-3">
+                    <HeroIcon
+                      icon={ExclamationCircleIcon}
+                      size="md"
+                      className="text-error-500 mt-0.5 flex-shrink-0"
+                    />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-semibold text-error-800 dark:text-error-200">
+                        Error Loading Notifications
+                      </h4>
+                      <p className="text-sm text-error-700 dark:text-error-300 mt-1">
+                        {error}
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={fetchNotifications}
+                        className="mt-3 border-error-300 text-error-700 hover:bg-error-50 dark:border-error-700 dark:text-error-300 dark:hover:bg-error-900/30"
+                      >
+                        <HeroIcon
+                          icon={ArrowPathIcon}
+                          size="sm"
+                          className="mr-2"
+                        />
+                        Try again
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
             {!loading && !error && notifications.length === 0 && (
-              <div className="flex flex-col items-center justify-center p-8 text-center">
-                <svg
-                  className="w-12 h-12 text-gray-400 mb-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 17h5l-5 5-5-5h5v-5a7.5 7.5 0 01-7.5-7.5H7.5a7.5 7.5 0 017.5 7.5v5z"
+              <div className="flex flex-col items-center justify-center p-12 text-center">
+                <div className="w-20 h-20 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mb-6 animate-pulse">
+                  <HeroIcon
+                    icon={BellIcon}
+                    size="xl"
+                    className="text-neutral-400 dark:text-neutral-500"
                   />
-                </svg>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                </div>
+                <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
                   No notifications
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-xs">
                   {showUnreadOnly
-                    ? "No unread notifications"
-                    : "No notifications to display"}
+                    ? "All caught up! No unread notifications at the moment."
+                    : "You're all set! No notifications to display right now."}
                 </p>
               </div>
             )}
 
             {!loading && !error && notifications.length > 0 && (
-              <div className="divide-y divide-gray-200">
-                {notifications.map((notification) => (
+              <div className="p-4 space-y-3">
+                {notifications.map((notification, index) => (
                   <div
                     key={notification.id}
-                    className={`p-4 hover:bg-gray-50 transition-colors ${
-                      !notification.is_read ? "bg-blue-50" : ""
+                    className={`relative bg-white dark:bg-neutral-800 rounded-xl border transition-all duration-200 hover:shadow-md interactive-enhanced stagger-item ${
+                      !notification.is_read
+                        ? "border-primary-200 dark:border-primary-700 bg-primary-50/50 dark:bg-primary-900/10"
+                        : "border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600"
                     }`}
+                    style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <div className="flex items-start space-x-3">
-                      {getNotificationIcon(notification.type)}
+                    <div className="p-4">
+                      <div className="flex items-start space-x-4">
+                        {getNotificationIcon(notification.type)}
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                            {getTypeDisplayName(notification.type)}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {formatNotificationTime(notification.created_at)}
-                          </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-2">
+                            <StatusBadge
+                              status={
+                                notification.type === "BUY_SOON"
+                                  ? "error"
+                                  : notification.type === "DOSE_DUE"
+                                  ? "info"
+                                  : notification.type === "MISSED_DOSE"
+                                  ? "warning"
+                                  : "neutral"
+                              }
+                              size="sm"
+                              variant="soft"
+                            >
+                              {getTypeDisplayName(notification.type)}
+                            </StatusBadge>
+                            <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                              {formatNotificationTime(notification.created_at)}
+                            </span>
+                          </div>
+
+                          <p className="text-sm text-neutral-900 dark:text-neutral-100 font-medium mb-2 leading-relaxed">
+                            {notification.message}
+                          </p>
+
+                          {notification.medication_name && (
+                            <div className="bg-neutral-100 dark:bg-neutral-700 rounded-lg px-3 py-2 mb-3">
+                              <p className="text-xs text-neutral-700 dark:text-neutral-300 font-medium">
+                                {notification.medication_name}
+                                {notification.medication_strength &&
+                                  ` (${notification.medication_strength})`}
+                              </p>
+                            </div>
+                          )}
+
+                          {!notification.is_read && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => markAsRead(notification.id)}
+                              disabled={markingAsRead.has(notification.id)}
+                              loading={markingAsRead.has(notification.id)}
+                              className="text-primary-600 hover:text-primary-700 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/30"
+                            >
+                              {markingAsRead.has(notification.id)
+                                ? "Marking..."
+                                : "Mark as read"}
+                            </Button>
+                          )}
                         </div>
 
-                        <p className="text-sm text-gray-900 mb-1">
-                          {notification.message}
-                        </p>
-
-                        {notification.medication_name && (
-                          <p className="text-xs text-gray-600">
-                            {notification.medication_name}
-                            {notification.medication_strength &&
-                              ` (${notification.medication_strength})`}
-                          </p>
-                        )}
-
                         {!notification.is_read && (
-                          <button
-                            onClick={() => markAsRead(notification.id)}
-                            disabled={markingAsRead.has(notification.id)}
-                            className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50"
-                          >
-                            {markingAsRead.has(notification.id)
-                              ? "Marking..."
-                              : "Mark as read"}
-                          </button>
+                          <div className="flex-shrink-0 w-3 h-3 bg-primary-500 rounded-full mt-1 animate-pulse" />
                         )}
                       </div>
-
-                      {!notification.is_read && (
-                        <div className="flex-shrink-0 w-2 h-2 bg-blue-600 rounded-full mt-2" />
-                      )}
                     </div>
                   </div>
                 ))}
@@ -405,28 +433,19 @@ const NotificationPanel = ({
             )}
           </div>
 
-          {/* Footer */}
-          <div className="border-t border-gray-200 p-4">
-            <button
+          {/* Enhanced Footer */}
+          <div className="border-t border-neutral-200 dark:border-neutral-700 p-4 bg-neutral-50 dark:bg-neutral-800/50">
+            <Button
+              variant="outline"
+              size="md"
               onClick={fetchNotifications}
               disabled={loading}
-              className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              loading={loading}
+              className="w-full border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700"
             >
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              Refresh
-            </button>
+              <HeroIcon icon={ArrowPathIcon} size="sm" className="mr-2" />
+              Refresh Notifications
+            </Button>
           </div>
         </div>
       </div>

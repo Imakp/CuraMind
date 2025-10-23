@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { BellIcon } from "@heroicons/react/24/outline";
+import { HeroIcon } from "./ui/Icon";
 import NotificationPanel from "./NotificationPanel";
 
 const NotificationBell = ({ medicationId = null }) => {
@@ -51,33 +53,38 @@ const NotificationBell = ({ medicationId = null }) => {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md transition-colors"
-        title="View notifications"
+        className={`relative p-3 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-neutral-800 interactive-enhanced ${
+          unreadCount > 0
+            ? "text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 breathe"
+            : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+        }`}
+        title={`View notifications${
+          unreadCount > 0 ? ` (${unreadCount} unread)` : ""
+        }`}
       >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 17h5l-5 5-5-5h5v-5a7.5 7.5 0 01-7.5-7.5H7.5a7.5 7.5 0 017.5 7.5v5z"
-          />
-        </svg>
+        <HeroIcon
+          icon={BellIcon}
+          size="lg"
+          className={`transition-transform duration-200 ${
+            unreadCount > 0 ? "animate-pulse" : "hover:scale-110"
+          }`}
+        />
 
-        {/* Unread count badge */}
+        {/* Enhanced Unread count badge */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 bg-error-500 text-white text-xs font-bold rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center shadow-lg border-2 border-white dark:border-neutral-800 animate-bounce">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
 
-        {/* Loading indicator */}
-        {loading && (
-          <span className="absolute -top-1 -right-1 bg-blue-500 rounded-full h-3 w-3 animate-pulse" />
+        {/* Enhanced Loading indicator */}
+        {loading && !unreadCount && (
+          <span className="absolute -top-1 -right-1 bg-primary-500 rounded-full h-3 w-3 animate-pulse shadow-lg" />
+        )}
+
+        {/* Notification pulse ring */}
+        {unreadCount > 0 && (
+          <span className="absolute inset-0 rounded-xl bg-primary-400 opacity-20 animate-ping" />
         )}
       </button>
 

@@ -1,4 +1,16 @@
 import { useState, useEffect } from "react";
+import {
+  CubeIcon,
+  PlusIcon,
+  MinusIcon,
+  ArrowsRightLeftIcon,
+  ExclamationCircleIcon,
+  CheckCircleIcon,
+} from "@heroicons/react/24/outline";
+import { HeroIcon } from "./ui/Icon";
+import Button from "./ui/Button";
+import Input from "./ui/Input";
+import StatusBadge from "./ui/StatusBadge";
 
 const InventoryTracker = ({
   totalTablets = 0,
@@ -144,193 +156,215 @@ const InventoryTracker = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Inventory Tracker</h3>
+    <div className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 hover:shadow-md transition-all duration-200 card-parallax">
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-success-100 dark:bg-success-900/30 rounded-xl">
+            <HeroIcon
+              icon={CubeIcon}
+              size="md"
+              className="text-success-600 dark:text-success-400"
+            />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
+              Inventory Tracker
+            </h3>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+              Manage medication stock levels
+            </p>
+          </div>
+        </div>
 
         {showConversion && (
-          <div className="flex bg-gray-100 rounded-lg p-1">
-            <button
+          <div className="flex bg-neutral-100 dark:bg-neutral-700 rounded-xl p-1 border border-neutral-200 dark:border-neutral-600">
+            <Button
               type="button"
+              variant={inputMode === "tablets" ? "primary" : "ghost"}
+              size="sm"
               onClick={() => handleInputModeChange("tablets")}
-              className={`px-3 py-1 text-sm rounded-md transition-colors ${
+              className={`rounded-lg transition-all duration-200 ${
                 inputMode === "tablets"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "shadow-sm"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
               }`}
             >
+              <HeroIcon icon={CubeIcon} size="sm" className="mr-1" />
               Tablets
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant={inputMode === "sheets" ? "primary" : "ghost"}
+              size="sm"
               onClick={() => handleInputModeChange("sheets")}
-              className={`px-3 py-1 text-sm rounded-md transition-colors ${
+              className={`rounded-lg transition-all duration-200 ${
                 inputMode === "sheets"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "shadow-sm"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
               }`}
             >
+              <HeroIcon icon={ArrowsRightLeftIcon} size="sm" className="mr-1" />
               Sheets
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {inputMode === "tablets" ? (
-          /* Tablets Input Mode */
-          <div>
-            <label
-              htmlFor="totalTablets"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Total Tablets
-            </label>
-            <input
+          /* Enhanced Tablets Input Mode */
+          <div className="space-y-4">
+            <Input
+              label="Total Tablets"
               type="number"
-              id="totalTablets"
               step="0.5"
               min="0"
               value={formData.totalTablets}
               onChange={(e) => handleChange("totalTablets", e.target.value)}
               disabled={disabled}
-              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 ${
-                errors.totalTablets || totalTabletsError
-                  ? "border-red-300"
-                  : "border-gray-300"
-              }`}
+              error={errors.totalTablets || totalTabletsError}
               placeholder="Enter total number of tablets"
+              leftIcon={<HeroIcon icon={CubeIcon} size="sm" />}
             />
-            {(errors.totalTablets || totalTabletsError) && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.totalTablets || totalTabletsError}
-              </p>
-            )}
 
             {showConversion && parseInt(formData.sheetSize) > 0 && (
-              <p className="mt-2 text-sm text-gray-600">
-                Equivalent: {currentEquivalent.sheets} sheet(s)
-                {currentEquivalent.remainder > 0 &&
-                  ` + ${currentEquivalent.remainder} tablet(s)`}
-              </p>
+              <div className="bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800 rounded-lg p-3">
+                <div className="flex items-center space-x-2">
+                  <HeroIcon
+                    icon={ArrowsRightLeftIcon}
+                    size="sm"
+                    className="text-info-600 dark:text-info-400"
+                  />
+                  <p className="text-sm text-info-700 dark:text-info-300 font-medium">
+                    Equivalent: {currentEquivalent.sheets} sheet(s)
+                    {currentEquivalent.remainder > 0 &&
+                      ` + ${currentEquivalent.remainder} tablet(s)`}
+                  </p>
+                </div>
+              </div>
             )}
           </div>
         ) : (
-          /* Sheets Input Mode */
+          /* Enhanced Sheets Input Mode */
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="sheetCount"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Number of Sheets
-                </label>
-                <input
-                  type="number"
-                  id="sheetCount"
-                  min="0"
-                  value={formData.sheetCount}
-                  onChange={(e) => handleChange("sheetCount", e.target.value)}
-                  disabled={disabled}
-                  className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 ${
-                    errors.sheetCount ? "border-red-300" : "border-gray-300"
-                  }`}
-                  placeholder="0"
-                />
-                {errors.sheetCount && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.sheetCount}
-                  </p>
-                )}
-              </div>
+              <Input
+                label="Number of Sheets"
+                type="number"
+                min="0"
+                value={formData.sheetCount}
+                onChange={(e) => handleChange("sheetCount", e.target.value)}
+                disabled={disabled}
+                error={errors.sheetCount}
+                placeholder="0"
+                leftIcon={<HeroIcon icon={ArrowsRightLeftIcon} size="sm" />}
+              />
 
-              <div>
-                <label
-                  htmlFor="sheetSize"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Tablets per Sheet
-                </label>
-                <input
-                  type="number"
-                  id="sheetSize"
-                  min="1"
-                  value={formData.sheetSize}
-                  onChange={(e) => handleChange("sheetSize", e.target.value)}
-                  disabled={disabled}
-                  className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 ${
-                    errors.sheetSize || sheetSizeError
-                      ? "border-red-300"
-                      : "border-gray-300"
-                  }`}
-                  placeholder="10"
-                />
-                {(errors.sheetSize || sheetSizeError) && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.sheetSize || sheetSizeError}
-                  </p>
-                )}
-              </div>
+              <Input
+                label="Tablets per Sheet"
+                type="number"
+                min="1"
+                value={formData.sheetSize}
+                onChange={(e) => handleChange("sheetSize", e.target.value)}
+                disabled={disabled}
+                error={errors.sheetSize || sheetSizeError}
+                placeholder="10"
+                leftIcon={<HeroIcon icon={CubeIcon} size="sm" />}
+              />
             </div>
 
-            <div className="p-3 bg-gray-50 rounded-md">
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">Total tablets:</span>{" "}
-                {formData.totalTablets || 0}
-              </p>
+            <div className="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-4">
+              <div className="flex items-center space-x-3">
+                <HeroIcon
+                  icon={CheckCircleIcon}
+                  size="md"
+                  className="text-success-600 dark:text-success-400"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-success-800 dark:text-success-200">
+                    Total Tablets Calculated
+                  </p>
+                  <p className="text-lg font-bold text-success-900 dark:text-success-100">
+                    {formData.totalTablets || 0} tablets
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Current Inventory Display */}
-        <div className="border-t border-gray-200 pt-4">
-          <h4 className="text-sm font-medium text-gray-900 mb-2">
-            Current Inventory
-          </h4>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-gray-600">Total tablets:</span>
-              <p className="font-medium text-gray-900">{totalTablets}</p>
-            </div>
-            <div>
-              <span className="text-gray-600">Sheet equivalent:</span>
-              <p className="font-medium text-gray-900">
-                {Math.floor(totalTablets / sheetSize)} sheets
-                {totalTablets % sheetSize > 0 &&
-                  ` + ${totalTablets % sheetSize} tablets`}
+        {/* Enhanced Current Inventory Display */}
+        <div className="border-t border-neutral-200 dark:border-neutral-700 pt-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <HeroIcon
+              icon={CubeIcon}
+              size="sm"
+              className="text-neutral-600 dark:text-neutral-400"
+            />
+            <h4 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+              Current Inventory
+            </h4>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-xl border border-neutral-200 dark:border-neutral-600">
+              <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2">
+                Total Tablets
               </p>
+              <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                {totalTablets}
+              </p>
+            </div>
+            <div className="text-center p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-xl border border-neutral-200 dark:border-neutral-600">
+              <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2">
+                Sheet Equivalent
+              </p>
+              <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                {Math.floor(totalTablets / sheetSize)}
+              </p>
+              {totalTablets % sheetSize > 0 && (
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                  + {totalTablets % sheetSize} tablets
+                </p>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Update Button */}
+        {/* Enhanced Update Button */}
         {hasChanges() && (
-          <div className="border-t border-gray-200 pt-4">
-            <button
+          <div className="border-t border-neutral-200 dark:border-neutral-700 pt-4">
+            <Button
               type="button"
+              variant="primary"
+              size="md"
               onClick={handleSubmit}
               disabled={disabled || Object.keys(errors).length > 0}
-              className={`w-full px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                disabled || Object.keys(errors).length > 0
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              }`}
+              className="w-full success-celebration"
             >
+              <HeroIcon icon={CheckCircleIcon} size="sm" className="mr-2" />
               Update Inventory
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
-      {/* Quick Actions */}
-      <div className="border-t border-gray-200 pt-4 mt-4">
-        <h4 className="text-sm font-medium text-gray-900 mb-2">
-          Quick Actions
-        </h4>
-        <div className="flex gap-2">
-          <button
+      {/* Enhanced Quick Actions */}
+      <div className="border-t border-neutral-200 dark:border-neutral-700 pt-6 mt-6">
+        <div className="flex items-center space-x-2 mb-4">
+          <HeroIcon
+            icon={ArrowsRightLeftIcon}
+            size="sm"
+            className="text-neutral-600 dark:text-neutral-400"
+          />
+          <h4 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+            Quick Actions
+          </h4>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Button
             type="button"
+            variant="outline"
+            size="md"
             onClick={() => {
               const currentTotal = parseFloat(formData.totalTablets) || 0;
               const newTotal =
@@ -345,12 +379,15 @@ const InventoryTracker = ({
               }));
             }}
             disabled={disabled}
-            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className="border-success-300 text-success-700 hover:bg-success-50 dark:border-success-700 dark:text-success-300 dark:hover:bg-success-900/30"
           >
+            <HeroIcon icon={PlusIcon} size="sm" className="mr-2" />
             +1 Sheet
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="outline"
+            size="md"
             onClick={() => {
               const currentTotal = parseFloat(formData.totalTablets) || 0;
               const newTotal = Math.max(
@@ -366,10 +403,11 @@ const InventoryTracker = ({
               }));
             }}
             disabled={disabled || parseFloat(formData.totalTablets) === 0}
-            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className="border-error-300 text-error-700 hover:bg-error-50 dark:border-error-700 dark:text-error-300 dark:hover:bg-error-900/30"
           >
+            <HeroIcon icon={MinusIcon} size="sm" className="mr-2" />
             -1 Sheet
-          </button>
+          </Button>
         </div>
       </div>
     </div>

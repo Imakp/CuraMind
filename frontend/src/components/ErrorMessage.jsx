@@ -1,3 +1,14 @@
+import {
+  ExclamationCircleIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+  CheckCircleIcon,
+  XMarkIcon,
+  ArrowPathIcon,
+} from "@heroicons/react/24/outline";
+import { HeroIcon } from "./ui/Icon";
+import Button from "./ui/Button";
+
 const ErrorMessage = ({ 
   title = 'Error',
   message = 'Something went wrong. Please try again.',
@@ -9,76 +20,46 @@ const ErrorMessage = ({
 }) => {
   const typeStyles = {
     error: {
-      container: 'bg-red-50 border-red-200 text-red-800',
-      icon: 'text-red-400',
-      button: 'bg-red-600 hover:bg-red-700 text-white'
+      container: 'bg-error-50 dark:bg-error-900/20 border-error-200 dark:border-error-800 text-error-800 dark:text-error-200',
+      icon: 'text-error-500 dark:text-error-400',
+      iconComponent: ExclamationCircleIcon
     },
     warning: {
-      container: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-      icon: 'text-yellow-400',
-      button: 'bg-yellow-600 hover:bg-yellow-700 text-white'
+      container: 'bg-warning-50 dark:bg-warning-900/20 border-warning-200 dark:border-warning-800 text-warning-800 dark:text-warning-200',
+      icon: 'text-warning-500 dark:text-warning-400',
+      iconComponent: ExclamationTriangleIcon
     },
     info: {
-      container: 'bg-blue-50 border-blue-200 text-blue-800',
-      icon: 'text-blue-400',
-      button: 'bg-blue-600 hover:bg-blue-700 text-white'
+      container: 'bg-info-50 dark:bg-info-900/20 border-info-200 dark:border-info-800 text-info-800 dark:text-info-200',
+      icon: 'text-info-500 dark:text-info-400',
+      iconComponent: InformationCircleIcon
     },
     success: {
-      container: 'bg-green-50 border-green-200 text-green-800',
-      icon: 'text-green-400',
-      button: 'bg-green-600 hover:bg-green-700 text-white'
+      container: 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-800 text-success-800 dark:text-success-200',
+      icon: 'text-success-500 dark:text-success-400',
+      iconComponent: CheckCircleIcon
     }
   }
 
   const styles = typeStyles[type] || typeStyles.error
-
-  const getIcon = () => {
-    switch (type) {
-      case 'error':
-        return (
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        )
-      case 'warning':
-        return (
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
-        )
-      case 'info':
-        return (
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        )
-      case 'success':
-        return (
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        )
-      default:
-        return null
-    }
-  }
+  const IconComponent = styles.iconComponent
 
   return (
-    <div className={`border rounded-md p-4 ${styles.container} ${className}`}>
-      <div className="flex">
+    <div className={`border rounded-xl p-4 animate-slide-down ${styles.container} ${className}`}>
+      <div className="flex items-start space-x-3">
         {showIcon && (
           <div className={`flex-shrink-0 ${styles.icon}`}>
-            {getIcon()}
+            <HeroIcon icon={IconComponent} size="md" />
           </div>
         )}
         
-        <div className={`${showIcon ? 'ml-3' : ''} flex-1`}>
-          <h3 className="text-sm font-medium">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold mb-1">
             {title}
           </h3>
           
           {message && (
-            <div className="mt-2 text-sm">
+            <div className="text-sm leading-relaxed">
               {typeof message === 'string' ? (
                 <p>{message}</p>
               ) : (
@@ -88,42 +69,48 @@ const ErrorMessage = ({
           )}
           
           {(onRetry || onDismiss) && (
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               {onRetry && (
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={onRetry}
-                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${styles.button}`}
+                  className={`${
+                    type === 'error' ? 'border-error-300 text-error-700 hover:bg-error-50 dark:border-error-700 dark:text-error-300 dark:hover:bg-error-900/30' :
+                    type === 'warning' ? 'border-warning-300 text-warning-700 hover:bg-warning-50 dark:border-warning-700 dark:text-warning-300 dark:hover:bg-warning-900/30' :
+                    type === 'info' ? 'border-info-300 text-info-700 hover:bg-info-50 dark:border-info-700 dark:text-info-300 dark:hover:bg-info-900/30' :
+                    'border-success-300 text-success-700 hover:bg-success-50 dark:border-success-700 dark:text-success-300 dark:hover:bg-success-900/30'
+                  }`}
                 >
+                  <HeroIcon icon={ArrowPathIcon} size="sm" className="mr-2" />
                   Try Again
-                </button>
+                </Button>
               )}
               
               {onDismiss && (
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={onDismiss}
-                  className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                  className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
                 >
                   Dismiss
-                </button>
+                </Button>
               )}
             </div>
           )}
         </div>
         
-        {onDismiss && (
-          <div className="ml-auto pl-3">
-            <button
-              type="button"
+        {onDismiss && !onRetry && (
+          <div className="flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onDismiss}
-              className={`inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 ${styles.icon} hover:bg-black hover:bg-opacity-10`}
+              className={`${styles.icon} hover:bg-black hover:bg-opacity-10 dark:hover:bg-white dark:hover:bg-opacity-10`}
             >
-              <span className="sr-only">Dismiss</span>
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+              <HeroIcon icon={XMarkIcon} size="sm" />
+            </Button>
           </div>
         )}
       </div>

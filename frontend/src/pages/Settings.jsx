@@ -1,6 +1,20 @@
 import { useState, useEffect } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
+import { HeroIcon } from "../components/ui/Icon";
+import Input from "../components/ui/Input";
+import Button from "../components/ui/Button";
+import {
+  CogIcon,
+  MapPinIcon,
+  ClockIcon,
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 
 const Settings = () => {
   const [routes, setRoutes] = useState([]);
@@ -320,58 +334,77 @@ const Settings = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner />
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center">
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-              <p className="mt-1 text-sm text-gray-600">
-                Manage routes and frequencies for your medications
-              </p>
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+      {/* Enhanced Header */}
+      <header className="bg-gradient-to-r from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 shadow-sm border-b border-neutral-200 dark:border-neutral-700">
+        <div className="layout-container py-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center">
+                <HeroIcon icon={CogIcon} size="lg" color="primary" />
+              </div>
+              <div>
+                <h1 className="text-heading-2 text-neutral-900 dark:text-neutral-100">
+                  Settings
+                </h1>
+                <p className="text-lg text-neutral-600 dark:text-neutral-400">
+                  Manage master data for your medications
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => (window.location.href = "/")}
+                className="btn-base btn-ghost btn-md lg:hidden"
+              >
+                <HeroIcon icon={ArrowLeftIcon} size="sm" />
+                Dashboard
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="layout-container py-8">
         {error && (
           <div className="mb-6">
             <ErrorMessage message={error} />
           </div>
         )}
 
-        {/* Tab Navigation */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8 px-6">
+        {/* Enhanced Tab Navigation */}
+        <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 mb-8">
+          <div className="border-b border-neutral-200 dark:border-neutral-700">
+            <nav className="flex px-6">
               <button
                 onClick={() => setActiveTab("routes")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`py-4 px-4 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
                   activeTab === "routes"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    ? "border-primary-500 text-primary-600 dark:text-primary-400"
+                    : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600"
                 }`}
               >
+                <HeroIcon icon={MapPinIcon} size="sm" />
                 Routes ({routes.length})
               </button>
               <button
                 onClick={() => setActiveTab("frequencies")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`py-4 px-4 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
                   activeTab === "frequencies"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    ? "border-primary-500 text-primary-600 dark:text-primary-400"
+                    : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600"
                 }`}
               >
+                <HeroIcon icon={ClockIcon} size="sm" />
                 Frequencies ({frequencies.length})
               </button>
             </nav>
@@ -409,34 +442,22 @@ const Settings = () => {
             )}
           </div>
         </div>
-      </div>
+      </main>
 
-      {/* Back to Dashboard Button */}
-      <div className="fixed bottom-6 left-6">
+      {/* Enhanced Back to Dashboard Button */}
+      <div className="fixed bottom-6 left-6 hidden lg:block">
         <button
           onClick={() => (window.location.href = "/")}
-          className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-full p-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          className="w-12 h-12 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 rounded-full shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 flex items-center justify-center"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
+          <HeroIcon icon={ArrowLeftIcon} size="lg" />
         </button>
       </div>
     </div>
   );
 };
 
-// Route Management Component
+// Enhanced Route Management Component
 const RouteManagement = ({
   routes,
   routeForm,
@@ -451,148 +472,158 @@ const RouteManagement = ({
 }) => {
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-medium text-gray-900">Route Management</h2>
-        <p className="text-sm text-gray-600">
-          Manage medication administration routes (oral, inhale, subcutaneous,
-          etc.)
-        </p>
+      {/* Section Header */}
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
+          <HeroIcon icon={MapPinIcon} size="lg" color="primary" />
+        </div>
+        <div>
+          <h2 className="text-heading-4 text-neutral-900 dark:text-neutral-100">
+            Route Management
+          </h2>
+          <p className="text-body-small text-neutral-600 dark:text-neutral-400">
+            Manage medication administration routes (oral, inhale, subcutaneous,
+            etc.)
+          </p>
+        </div>
       </div>
 
-      {/* Route Form */}
-      <form onSubmit={onSubmit} className="mb-8 bg-gray-50 rounded-lg p-6">
-        <h3 className="text-md font-medium text-gray-900 mb-4">
-          {editingRoute ? "Edit Route" : "Add New Route"}
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="route-name"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Route Name *
-            </label>
-            <input
-              type="text"
-              id="route-name"
-              value={routeForm.name}
-              onChange={(e) =>
-                setRouteForm({ ...routeForm, name: e.target.value })
-              }
-              className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                routeFormErrors.name ? "border-red-300" : ""
-              }`}
-              placeholder="e.g., Oral, Inhale, Subcutaneous"
-            />
-            {routeFormErrors.name && (
-              <p className="mt-1 text-sm text-red-600">
-                {routeFormErrors.name}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="route-description"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Description
-            </label>
-            <input
-              type="text"
-              id="route-description"
-              value={routeForm.description}
-              onChange={(e) =>
-                setRouteForm({ ...routeForm, description: e.target.value })
-              }
-              className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                routeFormErrors.description ? "border-red-300" : ""
-              }`}
-              placeholder="Optional description"
-            />
-            {routeFormErrors.description && (
-              <p className="mt-1 text-sm text-red-600">
-                {routeFormErrors.description}
-              </p>
-            )}
-          </div>
+      {/* Enhanced Route Form */}
+      <form
+        onSubmit={onSubmit}
+        className="mb-8 bg-neutral-50 dark:bg-neutral-700/50 rounded-xl p-6 border border-neutral-200 dark:border-neutral-600"
+      >
+        <div className="flex items-center gap-3 mb-6">
+          <HeroIcon
+            icon={editingRoute ? PencilIcon : PlusIcon}
+            size="md"
+            color="primary"
+          />
+          <h3 className="text-heading-5 text-neutral-900 dark:text-neutral-100">
+            {editingRoute ? "Edit Route" : "Add New Route"}
+          </h3>
         </div>
 
-        <div className="flex justify-end space-x-3 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input
+            label="Route Name"
+            required
+            value={routeForm.name}
+            onChange={(e) =>
+              setRouteForm({ ...routeForm, name: e.target.value })
+            }
+            placeholder="e.g., Oral, Inhale, Subcutaneous"
+            error={routeFormErrors.name}
+          />
+
+          <Input
+            label="Description"
+            value={routeForm.description}
+            onChange={(e) =>
+              setRouteForm({ ...routeForm, description: e.target.value })
+            }
+            placeholder="Optional description"
+            error={routeFormErrors.description}
+          />
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6">
           {editingRoute && (
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
+            <Button type="button" variant="secondary" onClick={onCancel}>
+              <HeroIcon icon={XMarkIcon} size="sm" />
               Cancel
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             type="submit"
+            variant="primary"
+            loading={savingRoute}
             disabled={savingRoute}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {savingRoute
-              ? "Saving..."
-              : editingRoute
-              ? "Update Route"
-              : "Add Route"}
-          </button>
+            <HeroIcon
+              icon={editingRoute ? CheckCircleIcon : PlusIcon}
+              size="sm"
+            />
+            {editingRoute ? "Update Route" : "Add Route"}
+          </Button>
         </div>
       </form>
 
-      {/* Routes List */}
-      <div className="space-y-4">
-        {routes.length > 0 ? (
-          routes.map((route) => (
-            <div
-              key={route.id}
-              className="bg-white border border-gray-200 rounded-lg p-4 flex justify-between items-start"
-            >
-              <div className="flex-1">
-                <h4 className="font-medium text-gray-900">{route.name}</h4>
-                {route.description && (
-                  <p className="text-sm text-gray-600 mt-1">
-                    {route.description}
-                  </p>
-                )}
-                <p className="text-xs text-gray-500 mt-2">
-                  Created: {new Date(route.created_at).toLocaleDateString()}
-                </p>
-              </div>
+      {/* Enhanced Routes List */}
+      <div>
+        <h3 className="text-heading-5 text-neutral-900 dark:text-neutral-100 mb-4">
+          Existing Routes ({routes.length})
+        </h3>
 
-              <div className="flex items-center space-x-2 ml-4">
-                <button
-                  onClick={() => onEdit(route)}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => onDelete(route)}
-                  className="text-red-600 hover:text-red-800 text-sm font-medium"
-                >
-                  Delete
-                </button>
+        <div className="space-y-4">
+          {routes.length > 0 ? (
+            routes.map((route) => (
+              <div
+                key={route.id}
+                className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 hover:shadow-md transition-shadow"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <HeroIcon icon={MapPinIcon} size="sm" color="primary" />
+                      </div>
+                      <h4 className="text-heading-6 text-neutral-900 dark:text-neutral-100 truncate">
+                        {route.name}
+                      </h4>
+                    </div>
+                    {route.description && (
+                      <p className="text-body-small text-neutral-600 dark:text-neutral-400 mb-3 ml-11">
+                        {route.description}
+                      </p>
+                    )}
+                    <p className="text-caption text-neutral-500 dark:text-neutral-500 ml-11">
+                      Created: {new Date(route.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(route)}
+                    >
+                      <HeroIcon icon={PencilIcon} size="sm" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDelete(route)}
+                      className="text-error-600 hover:text-error-700 hover:bg-error-50 dark:hover:bg-error-900/20"
+                    >
+                      <HeroIcon icon={TrashIcon} size="sm" />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <HeroIcon icon={MapPinIcon} size="xl" color="muted" />
+              </div>
+              <h4 className="text-heading-6 text-neutral-900 dark:text-neutral-100 mb-2">
+                No routes configured yet
+              </h4>
+              <p className="text-body-small text-neutral-600 dark:text-neutral-400">
+                Add your first route using the form above.
+              </p>
             </div>
-          ))
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-gray-500">No routes configured yet.</p>
-            <p className="text-sm text-gray-400 mt-1">
-              Add your first route above.
-            </p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-// Frequency Management Component
+// Enhanced Frequency Management Component
 const FrequencyManagement = ({
   frequencies,
   frequencyForm,
@@ -607,147 +638,156 @@ const FrequencyManagement = ({
 }) => {
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-medium text-gray-900">
-          Frequency Management
-        </h2>
-        <p className="text-sm text-gray-600">
-          Manage medication frequency presets (daily, twice daily, as needed,
-          etc.)
-        </p>
+      {/* Section Header */}
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
+          <HeroIcon icon={ClockIcon} size="lg" color="primary" />
+        </div>
+        <div>
+          <h2 className="text-heading-4 text-neutral-900 dark:text-neutral-100">
+            Frequency Management
+          </h2>
+          <p className="text-body-small text-neutral-600 dark:text-neutral-400">
+            Manage medication frequency presets (daily, twice daily, as needed,
+            etc.)
+          </p>
+        </div>
       </div>
 
-      {/* Frequency Form */}
-      <form onSubmit={onSubmit} className="mb-8 bg-gray-50 rounded-lg p-6">
-        <h3 className="text-md font-medium text-gray-900 mb-4">
-          {editingFrequency ? "Edit Frequency" : "Add New Frequency"}
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="frequency-name"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Frequency Name *
-            </label>
-            <input
-              type="text"
-              id="frequency-name"
-              value={frequencyForm.name}
-              onChange={(e) =>
-                setFrequencyForm({ ...frequencyForm, name: e.target.value })
-              }
-              className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                frequencyFormErrors.name ? "border-red-300" : ""
-              }`}
-              placeholder="e.g., Daily, Twice Daily, As Needed"
-            />
-            {frequencyFormErrors.name && (
-              <p className="mt-1 text-sm text-red-600">
-                {frequencyFormErrors.name}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="frequency-description"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Description
-            </label>
-            <input
-              type="text"
-              id="frequency-description"
-              value={frequencyForm.description}
-              onChange={(e) =>
-                setFrequencyForm({
-                  ...frequencyForm,
-                  description: e.target.value,
-                })
-              }
-              className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-                frequencyFormErrors.description ? "border-red-300" : ""
-              }`}
-              placeholder="Optional description"
-            />
-            {frequencyFormErrors.description && (
-              <p className="mt-1 text-sm text-red-600">
-                {frequencyFormErrors.description}
-              </p>
-            )}
-          </div>
+      {/* Enhanced Frequency Form */}
+      <form
+        onSubmit={onSubmit}
+        className="mb-8 bg-neutral-50 dark:bg-neutral-700/50 rounded-xl p-6 border border-neutral-200 dark:border-neutral-600"
+      >
+        <div className="flex items-center gap-3 mb-6">
+          <HeroIcon
+            icon={editingFrequency ? PencilIcon : PlusIcon}
+            size="md"
+            color="primary"
+          />
+          <h3 className="text-heading-5 text-neutral-900 dark:text-neutral-100">
+            {editingFrequency ? "Edit Frequency" : "Add New Frequency"}
+          </h3>
         </div>
 
-        <div className="flex justify-end space-x-3 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input
+            label="Frequency Name"
+            required
+            value={frequencyForm.name}
+            onChange={(e) =>
+              setFrequencyForm({ ...frequencyForm, name: e.target.value })
+            }
+            placeholder="e.g., Daily, Twice Daily, As Needed"
+            error={frequencyFormErrors.name}
+          />
+
+          <Input
+            label="Description"
+            value={frequencyForm.description}
+            onChange={(e) =>
+              setFrequencyForm({
+                ...frequencyForm,
+                description: e.target.value,
+              })
+            }
+            placeholder="Optional description"
+            error={frequencyFormErrors.description}
+          />
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6">
           {editingFrequency && (
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
+            <Button type="button" variant="secondary" onClick={onCancel}>
+              <HeroIcon icon={XMarkIcon} size="sm" />
               Cancel
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             type="submit"
+            variant="primary"
+            loading={savingFrequency}
             disabled={savingFrequency}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {savingFrequency
-              ? "Saving..."
-              : editingFrequency
-              ? "Update Frequency"
-              : "Add Frequency"}
-          </button>
+            <HeroIcon
+              icon={editingFrequency ? CheckCircleIcon : PlusIcon}
+              size="sm"
+            />
+            {editingFrequency ? "Update Frequency" : "Add Frequency"}
+          </Button>
         </div>
       </form>
 
-      {/* Frequencies List */}
-      <div className="space-y-4">
-        {frequencies.length > 0 ? (
-          frequencies.map((frequency) => (
-            <div
-              key={frequency.id}
-              className="bg-white border border-gray-200 rounded-lg p-4 flex justify-between items-start"
-            >
-              <div className="flex-1">
-                <h4 className="font-medium text-gray-900">{frequency.name}</h4>
-                {frequency.description && (
-                  <p className="text-sm text-gray-600 mt-1">
-                    {frequency.description}
-                  </p>
-                )}
-                <p className="text-xs text-gray-500 mt-2">
-                  Created: {new Date(frequency.created_at).toLocaleDateString()}
-                </p>
-              </div>
+      {/* Enhanced Frequencies List */}
+      <div>
+        <h3 className="text-heading-5 text-neutral-900 dark:text-neutral-100 mb-4">
+          Existing Frequencies ({frequencies.length})
+        </h3>
 
-              <div className="flex items-center space-x-2 ml-4">
-                <button
-                  onClick={() => onEdit(frequency)}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => onDelete(frequency)}
-                  className="text-red-600 hover:text-red-800 text-sm font-medium"
-                >
-                  Delete
-                </button>
+        <div className="space-y-4">
+          {frequencies.length > 0 ? (
+            frequencies.map((frequency) => (
+              <div
+                key={frequency.id}
+                className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 hover:shadow-md transition-shadow"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <HeroIcon icon={ClockIcon} size="sm" color="primary" />
+                      </div>
+                      <h4 className="text-heading-6 text-neutral-900 dark:text-neutral-100 truncate">
+                        {frequency.name}
+                      </h4>
+                    </div>
+                    {frequency.description && (
+                      <p className="text-body-small text-neutral-600 dark:text-neutral-400 mb-3 ml-11">
+                        {frequency.description}
+                      </p>
+                    )}
+                    <p className="text-caption text-neutral-500 dark:text-neutral-500 ml-11">
+                      Created:{" "}
+                      {new Date(frequency.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(frequency)}
+                    >
+                      <HeroIcon icon={PencilIcon} size="sm" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDelete(frequency)}
+                      className="text-error-600 hover:text-error-700 hover:bg-error-50 dark:hover:bg-error-900/20"
+                    >
+                      <HeroIcon icon={TrashIcon} size="sm" />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <HeroIcon icon={ClockIcon} size="xl" color="muted" />
+              </div>
+              <h4 className="text-heading-6 text-neutral-900 dark:text-neutral-100 mb-2">
+                No frequencies configured yet
+              </h4>
+              <p className="text-body-small text-neutral-600 dark:text-neutral-400">
+                Add your first frequency using the form above.
+              </p>
             </div>
-          ))
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-gray-500">No frequencies configured yet.</p>
-            <p className="text-sm text-gray-400 mt-1">
-              Add your first frequency above.
-            </p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

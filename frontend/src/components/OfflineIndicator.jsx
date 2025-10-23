@@ -1,55 +1,103 @@
+import { useState, useEffect } from "react";
+import {
+  WifiIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { HeroIcon } from "./ui/Icon";
+import Button from "./ui/Button";
 import { useOnline } from "../hooks/useOnline";
 
 const OfflineIndicator = () => {
   const { isOnline, wasOffline } = useOnline();
+  const [showOnlineMessage, setShowOnlineMessage] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
-  if (isOnline && !wasOffline) {
+  useEffect(() => {
+    if (wasOffline && isOnline) {
+      setShowOnlineMessage(true);
+      setDismissed(false);
+      // Auto-hide the "back online" message after 5 seconds
+      const timer = setTimeout(() => {
+        setShowOnlineMessage(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [wasOffline, isOnline]);
+
+  if ((isOnline && !showOnlineMessage) || dismissed) {
     return null;
   }
 
+  const handleDismiss = () => {
+    setDismissed(true);
+    setShowOnlineMessage(false);
+  };
+
   return (
-    <div className="fixed top-0 left-0 right-0 z-50">
-      {!isOnline ? (
-        // Offline indicator
-        <div className="bg-red-600 text-white px-4 py-2 text-center text-sm font-medium">
-          <div className="flex items-center justify-center space-x-2">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M18.364 5.636l-12.728 12.728m0-12.728l12.728 12.728"
-              />
-            </svg>
-            <span>You're offline. Some features may not work.</span>
+    <div className="fixed top-4 left-4 right-4 z-50 flex justify-center">
+      <div className="max-w-md w-full">
+        {!isOnline ? (
+          // Enhanced Offline indicator
+          <div className="bg-error-600 dark:bg-error-700 text-white rounded-xl shadow-lg border border-error-700 dark:border-error-600 p-4 animate-slide-down">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-error-500/20 rounded-xl flex items-center justify-center">
+                  <HeroIcon
+                    icon={ExclamationTriangleIcon}
+                    size="md"
+                    className="text-white"
+                  />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold mb-1">You're offline</h4>
+                <p className="text-xs text-error-100">
+                  Some features may not work properly. Check your internet
+                  connection.
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                <div className="w-3 h-3 bg-error-400 rounded-full animate-pulse" />
+              </div>
+            </div>
           </div>
-        </div>
-      ) : wasOffline ? (
-        // Back online indicator
-        <div className="bg-green-600 text-white px-4 py-2 text-center text-sm font-medium animate-pulse">
-          <div className="flex items-center justify-center space-x-2">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>You're back online!</span>
+        ) : showOnlineMessage ? (
+          // Enhanced Back online indicator
+          <div className="bg-success-600 dark:bg-success-700 text-white rounded-xl shadow-lg border border-success-700 dark:border-success-600 p-4 animate-slide-down">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-success-500/20 rounded-xl flex items-center justify-center animate-bounce">
+                  <HeroIcon
+                    icon={CheckCircleIcon}
+                    size="md"
+                    className="text-white"
+                  />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold mb-1">
+                  You're back online!
+                </h4>
+                <p className="text-xs text-success-100">
+                  All features are now available.
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleDismiss}
+                  className="text-white hover:bg-success-500/20 -mr-2"
+                >
+                  <HeroIcon icon={XMarkIcon} size="sm" />
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   );
 };

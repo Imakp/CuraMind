@@ -1,150 +1,187 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
+import {
+  MagnifyingGlassIcon,
+  XMarkIcon,
+  FunnelIcon,
+  AdjustmentsHorizontalIcon,
+} from "@heroicons/react/24/outline";
+import { HeroIcon } from "./ui/Icon";
+import Button from "./ui/Button";
 
-const SearchFilter = ({ 
-  onSearch, 
-  onFilter, 
+const SearchFilter = ({
+  onSearch,
+  onFilter,
   onSort,
-  placeholder = 'Search...',
-  searchValue = '',
+  placeholder = "Search...",
+  searchValue = "",
   filters = [],
   sortOptions = [],
   selectedFilters = {},
-  selectedSort = '',
-  disabled = false
+  selectedSort = "",
+  disabled = false,
 }) => {
-  const [localSearchValue, setLocalSearchValue] = useState(searchValue)
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+  const [localSearchValue, setLocalSearchValue] = useState(searchValue);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   useEffect(() => {
-    setLocalSearchValue(searchValue)
-  }, [searchValue])
+    setLocalSearchValue(searchValue);
+  }, [searchValue]);
 
   const handleSearchChange = (e) => {
-    const value = e.target.value
-    setLocalSearchValue(value)
-    
+    const value = e.target.value;
+    setLocalSearchValue(value);
+
     // Debounce search
     const timeoutId = setTimeout(() => {
-      onSearch(value)
-    }, 300)
-    
-    return () => clearTimeout(timeoutId)
-  }
+      onSearch(value);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  };
 
   const handleSearchSubmit = (e) => {
-    e.preventDefault()
-    onSearch(localSearchValue)
-  }
+    e.preventDefault();
+    onSearch(localSearchValue);
+  };
 
   const handleFilterChange = (filterKey, value) => {
-    const newFilters = { ...selectedFilters }
-    
-    if (value === '' || value === null) {
-      delete newFilters[filterKey]
+    const newFilters = { ...selectedFilters };
+
+    if (value === "" || value === null) {
+      delete newFilters[filterKey];
     } else {
-      newFilters[filterKey] = value
+      newFilters[filterKey] = value;
     }
-    
-    onFilter(newFilters)
-  }
+
+    onFilter(newFilters);
+  };
 
   const handleSortChange = (sortValue) => {
-    onSort(sortValue)
-  }
+    onSort(sortValue);
+  };
 
   const clearAllFilters = () => {
-    onFilter({})
-    onSort('')
-    onSearch('')
-    setLocalSearchValue('')
-  }
+    onFilter({});
+    onSort("");
+    onSearch("");
+    setLocalSearchValue("");
+  };
 
-  const activeFilterCount = Object.keys(selectedFilters).length + (selectedSort ? 1 : 0)
+  const activeFilterCount =
+    Object.keys(selectedFilters).length + (selectedSort ? 1 : 0);
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
-      <form onSubmit={handleSearchSubmit} className="flex gap-2">
+      {/* Enhanced Search Bar with better visual hierarchy */}
+      <form onSubmit={handleSearchSubmit} className="flex gap-3">
         <div className="flex-1 relative">
-          <input
-            type="text"
-            value={localSearchValue}
-            onChange={handleSearchChange}
-            disabled={disabled}
-            placeholder={placeholder}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-          />
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          {localSearchValue && (
-            <button
-              type="button"
-              onClick={() => {
-                setLocalSearchValue('')
-                onSearch('')
-              }}
+          <div className="form-input-container">
+            <input
+              type="text"
+              value={localSearchValue}
+              onChange={handleSearchChange}
               disabled={disabled}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center"
-            >
-              <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
+              placeholder={placeholder}
+              className="form-input-base form-input-md w-full pl-12 pr-12"
+              aria-label="Search medications"
+            />
+
+            {/* Search icon */}
+            <div className="form-input-icon form-input-icon-left">
+              <HeroIcon
+                icon={MagnifyingGlassIcon}
+                size="md"
+                className="text-neutral-400"
+              />
+            </div>
+
+            {/* Clear search button */}
+            {localSearchValue && (
+              <div className="form-input-icon form-input-icon-right">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLocalSearchValue("");
+                    onSearch("");
+                  }}
+                  disabled={disabled}
+                  className="p-1 rounded-md text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  aria-label="Clear search"
+                >
+                  <HeroIcon icon={XMarkIcon} size="sm" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        
-        {/* Filter Toggle Button */}
+
+        {/* Enhanced Filter Toggle Button */}
         {(filters.length > 0 || sortOptions.length > 0) && (
-          <button
+          <Button
             type="button"
+            variant={
+              isFiltersOpen || activeFilterCount > 0 ? "primary" : "secondary"
+            }
+            size="md"
             onClick={() => setIsFiltersOpen(!isFiltersOpen)}
             disabled={disabled}
-            className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-              isFiltersOpen || activeFilterCount > 0
-                ? 'bg-blue-50 border-blue-300 text-blue-700'
-                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-            }`}
+            className="flex-shrink-0 relative"
+            aria-label={`${
+              isFiltersOpen ? "Hide" : "Show"
+            } filters and sorting options`}
+            aria-expanded={isFiltersOpen}
           >
-            <div className="flex items-center gap-2">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              Filters
-              {activeFilterCount > 0 && (
-                <span className="bg-blue-600 text-white text-xs rounded-full px-2 py-0.5">
-                  {activeFilterCount}
-                </span>
-              )}
-            </div>
-          </button>
+            <HeroIcon
+              icon={
+                activeFilterCount > 0 ? AdjustmentsHorizontalIcon : FunnelIcon
+              }
+              size="sm"
+              className="mr-2"
+            />
+            <span className="hidden sm:inline">Filters</span>
+
+            {/* Active filter count badge */}
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-error-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
         )}
       </form>
 
-      {/* Filters Panel */}
+      {/* Enhanced Filters Panel with better visual hierarchy */}
       {isFiltersOpen && (filters.length > 0 || sortOptions.length > 0) && (
-        <div className="bg-gray-50 border border-gray-200 rounded-md p-4 space-y-4">
+        <div className="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 space-y-6 animate-slide-down">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-900">Filters & Sorting</h3>
+            <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 flex items-center">
+              <HeroIcon
+                icon={AdjustmentsHorizontalIcon}
+                size="md"
+                className="mr-2 text-primary-600"
+              />
+              Filters & Sorting
+            </h3>
             {activeFilterCount > 0 && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={clearAllFilters}
                 disabled={disabled}
-                className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
+                className="text-error-600 hover:text-error-700 hover:bg-error-50"
               >
+                <HeroIcon icon={XMarkIcon} size="sm" className="mr-1" />
                 Clear All
-              </button>
+              </Button>
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Sort Options */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Enhanced Sort Options */}
             {sortOptions.length > 0 && (
-              <div>
-                <label htmlFor="sort-select" className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="form-field">
+                <label htmlFor="sort-select" className="form-label">
                   Sort By
                 </label>
                 <select
@@ -152,7 +189,7 @@ const SearchFilter = ({
                   value={selectedSort}
                   onChange={(e) => handleSortChange(e.target.value)}
                   disabled={disabled}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  className="form-input-base form-input-md w-full"
                 >
                   <option value="">Default</option>
                   {sortOptions.map((option) => (
@@ -164,19 +201,21 @@ const SearchFilter = ({
               </div>
             )}
 
-            {/* Filter Options */}
+            {/* Enhanced Filter Options */}
             {filters.map((filter) => (
-              <div key={filter.key}>
-                <label htmlFor={`filter-${filter.key}`} className="block text-sm font-medium text-gray-700 mb-1">
+              <div key={filter.key} className="form-field">
+                <label htmlFor={`filter-${filter.key}`} className="form-label">
                   {filter.label}
                 </label>
-                {filter.type === 'select' ? (
+                {filter.type === "select" ? (
                   <select
                     id={`filter-${filter.key}`}
-                    value={selectedFilters[filter.key] || ''}
-                    onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+                    value={selectedFilters[filter.key] || ""}
+                    onChange={(e) =>
+                      handleFilterChange(filter.key, e.target.value)
+                    }
                     disabled={disabled}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                    className="form-input-base form-input-md w-full"
                   >
                     <option value="">All {filter.label}</option>
                     {filter.options.map((option) => (
@@ -185,36 +224,51 @@ const SearchFilter = ({
                       </option>
                     ))}
                   </select>
-                ) : filter.type === 'checkbox' ? (
-                  <div className="space-y-2">
+                ) : filter.type === "checkbox" ? (
+                  <div className="space-y-3">
                     {filter.options.map((option) => (
-                      <label key={option.value} className="flex items-center">
+                      <label
+                        key={option.value}
+                        className="flex items-center group cursor-pointer"
+                      >
                         <input
                           type="checkbox"
-                          checked={selectedFilters[filter.key]?.includes(option.value) || false}
+                          checked={
+                            selectedFilters[filter.key]?.includes(
+                              option.value
+                            ) || false
+                          }
                           onChange={(e) => {
-                            const currentValues = selectedFilters[filter.key] || []
+                            const currentValues =
+                              selectedFilters[filter.key] || [];
                             const newValues = e.target.checked
                               ? [...currentValues, option.value]
-                              : currentValues.filter(v => v !== option.value)
-                            handleFilterChange(filter.key, newValues.length > 0 ? newValues : null)
+                              : currentValues.filter((v) => v !== option.value);
+                            handleFilterChange(
+                              filter.key,
+                              newValues.length > 0 ? newValues : null
+                            );
                           }}
                           disabled={disabled}
-                          className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:opacity-50"
+                          className="mr-3 h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded disabled:opacity-50 transition-colors duration-200"
                         />
-                        <span className="text-sm text-gray-700">{option.label}</span>
+                        <span className="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors duration-200">
+                          {option.label}
+                        </span>
                       </label>
                     ))}
                   </div>
                 ) : (
                   <input
                     id={`filter-${filter.key}`}
-                    type={filter.type || 'text'}
-                    value={selectedFilters[filter.key] || ''}
-                    onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+                    type={filter.type || "text"}
+                    value={selectedFilters[filter.key] || ""}
+                    onChange={(e) =>
+                      handleFilterChange(filter.key, e.target.value)
+                    }
                     disabled={disabled}
                     placeholder={filter.placeholder}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                    className="form-input-base form-input-md w-full"
                   />
                 )}
               </div>
@@ -223,56 +277,65 @@ const SearchFilter = ({
         </div>
       )}
 
-      {/* Active Filters Display */}
+      {/* Enhanced Active Filters Display */}
       {activeFilterCount > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {Object.entries(selectedFilters).map(([key, value]) => {
-            const filter = filters.find(f => f.key === key)
-            if (!filter || !value) return null
-            
-            const displayValue = Array.isArray(value) 
-              ? value.join(', ')
-              : filter.options?.find(opt => opt.value === value)?.label || value
-            
-            return (
-              <span
-                key={key}
-                className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
-              >
-                {filter.label}: {displayValue}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+            Active Filters ({activeFilterCount})
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(selectedFilters).map(([key, value]) => {
+              const filter = filters.find((f) => f.key === key);
+              if (!filter || !value) return null;
+
+              const displayValue = Array.isArray(value)
+                ? value.join(", ")
+                : filter.options?.find((opt) => opt.value === value)?.label ||
+                  value;
+
+              return (
+                <span
+                  key={key}
+                  className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 border border-primary-200 dark:border-primary-800 transition-colors duration-200"
+                >
+                  <span className="font-medium">{filter.label}:</span>
+                  <span className="ml-1">{displayValue}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleFilterChange(key, null)}
+                    disabled={disabled}
+                    className="ml-2 hover:bg-primary-200 dark:hover:bg-primary-800 rounded-full p-1 disabled:opacity-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    aria-label={`Remove ${filter.label} filter`}
+                  >
+                    <HeroIcon icon={XMarkIcon} size="xs" />
+                  </button>
+                </span>
+              );
+            })}
+
+            {selectedSort && (
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-success-100 dark:bg-success-900/30 text-success-800 dark:text-success-200 border border-success-200 dark:border-success-800 transition-colors duration-200">
+                <span className="font-medium">Sort:</span>
+                <span className="ml-1">
+                  {sortOptions.find((opt) => opt.value === selectedSort)
+                    ?.label || selectedSort}
+                </span>
                 <button
                   type="button"
-                  onClick={() => handleFilterChange(key, null)}
+                  onClick={() => handleSortChange("")}
                   disabled={disabled}
-                  className="ml-2 hover:bg-blue-200 rounded-full p-0.5 disabled:opacity-50"
+                  className="ml-2 hover:bg-success-200 dark:hover:bg-success-800 rounded-full p-1 disabled:opacity-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-success-500"
+                  aria-label="Remove sort"
                 >
-                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <HeroIcon icon={XMarkIcon} size="xs" />
                 </button>
               </span>
-            )
-          })}
-          
-          {selectedSort && (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
-              Sort: {sortOptions.find(opt => opt.value === selectedSort)?.label || selectedSort}
-              <button
-                type="button"
-                onClick={() => handleSortChange('')}
-                disabled={disabled}
-                className="ml-2 hover:bg-green-200 rounded-full p-0.5 disabled:opacity-50"
-              >
-                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </span>
-          )}
+            )}
+          </div>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default SearchFilter
+export default SearchFilter;

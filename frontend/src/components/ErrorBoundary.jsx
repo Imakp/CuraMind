@@ -1,4 +1,11 @@
 import { Component } from "react";
+import {
+  ExclamationTriangleIcon,
+  ArrowPathIcon,
+  HomeIcon,
+  DocumentDuplicateIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -114,70 +121,65 @@ class ErrorBoundary extends Component {
     if (this.state.hasError) {
       const { error, errorInfo, errorId, retryCount } = this.state;
 
-      // Custom error UI with enhanced features
+      // Enhanced custom error UI with modern design
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-          <div className="max-w-lg w-full bg-white shadow-lg rounded-lg p-6">
-            <div className="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 rounded-full">
-              <svg
-                className="w-8 h-8 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-900 dark:to-neutral-800 p-4">
+          <div className="max-w-lg w-full bg-white dark:bg-neutral-800 shadow-2xl rounded-2xl p-8 border border-neutral-200 dark:border-neutral-700 animate-scale-in">
+            <div className="flex items-center justify-center w-20 h-20 mx-auto bg-error-100 dark:bg-error-900/30 rounded-2xl mb-6 animate-pulse">
+              <ExclamationTriangleIcon className="w-10 h-10 text-error-600 dark:text-error-400" />
             </div>
 
-            <div className="mt-6 text-center">
-              <h3 className="text-xl font-semibold text-gray-900">
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">
                 Oops! Something went wrong
               </h3>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="text-neutral-600 dark:text-neutral-400 mb-4 leading-relaxed">
                 We encountered an unexpected error. Don't worry, your data is
-                safe.
+                safe and we're working to fix this.
               </p>
 
               {errorId && (
-                <p className="mt-2 text-xs text-gray-500">
-                  Error ID:{" "}
-                  <code className="bg-gray-100 px-1 rounded">{errorId}</code>
-                </p>
+                <div className="bg-neutral-100 dark:bg-neutral-700 rounded-lg p-3 mb-4">
+                  <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-1">
+                    Error ID
+                  </p>
+                  <code className="text-sm font-mono text-neutral-800 dark:text-neutral-200 bg-neutral-200 dark:bg-neutral-600 px-2 py-1 rounded">
+                    {errorId}
+                  </code>
+                </div>
               )}
 
               {retryCount > 0 && (
-                <p className="mt-2 text-xs text-orange-600">
-                  Retry attempts: {retryCount}
-                </p>
+                <div className="bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-warning-700 dark:text-warning-300">
+                    <span className="font-semibold">Retry attempts:</span>{" "}
+                    {retryCount}
+                  </p>
+                </div>
               )}
             </div>
 
-            {/* Error Details for Development */}
+            {/* Enhanced Error Details for Development */}
             {process.env.NODE_ENV === "development" && error && (
-              <details className="mt-6 text-left">
-                <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
+              <details className="mt-6 text-left bg-neutral-50 dark:bg-neutral-700/50 rounded-xl border border-neutral-200 dark:border-neutral-600">
+                <summary className="cursor-pointer p-4 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
                   🔍 Error Details (Development Mode)
                 </summary>
-                <div className="mt-3 space-y-3">
+                <div className="px-4 pb-4 space-y-4">
                   <div>
-                    <h4 className="text-xs font-medium text-gray-700 uppercase tracking-wide">
+                    <h4 className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wide mb-2">
                       Error Message
                     </h4>
-                    <pre className="mt-1 text-xs text-red-600 bg-red-50 p-2 rounded overflow-auto">
+                    <pre className="text-xs text-error-700 dark:text-error-300 bg-error-50 dark:bg-error-900/20 p-3 rounded-lg overflow-auto border border-error-200 dark:border-error-800">
                       {error.toString()}
                     </pre>
                   </div>
                   {errorInfo?.componentStack && (
                     <div>
-                      <h4 className="text-xs font-medium text-gray-700 uppercase tracking-wide">
+                      <h4 className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wide mb-2">
                         Component Stack
                       </h4>
-                      <pre className="mt-1 text-xs text-gray-600 bg-gray-50 p-2 rounded overflow-auto max-h-32">
+                      <pre className="text-xs text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 p-3 rounded-lg overflow-auto max-h-32 border border-neutral-200 dark:border-neutral-700">
                         {errorInfo.componentStack}
                       </pre>
                     </div>
@@ -186,44 +188,49 @@ class ErrorBoundary extends Component {
               </details>
             )}
 
-            {/* Action Buttons */}
-            <div className="mt-8 space-y-3">
-              <div className="flex space-x-3">
+            {/* Enhanced Action Buttons */}
+            <div className="mt-8 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   onClick={this.handleRetry}
-                  className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                  className="flex items-center justify-center space-x-2 bg-primary-600 text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 hover:shadow-lg interactive-enhanced"
                 >
-                  Try Again
+                  <ArrowPathIcon className="w-4 h-4" />
+                  <span>Try Again</span>
                 </button>
                 <button
                   onClick={this.handleReload}
-                  className="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+                  className="flex items-center justify-center space-x-2 bg-neutral-600 dark:bg-neutral-700 text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-neutral-700 dark:hover:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 transition-all duration-200 hover:shadow-lg interactive-enhanced"
                 >
-                  Refresh Page
+                  <ArrowPathIcon className="w-4 h-4" />
+                  <span>Refresh Page</span>
                 </button>
               </div>
 
-              <div className="flex space-x-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   onClick={this.handleGoHome}
-                  className="flex-1 bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                  className="flex items-center justify-center space-x-2 bg-success-600 text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-success-700 focus:outline-none focus:ring-2 focus:ring-success-500 focus:ring-offset-2 transition-all duration-200 hover:shadow-lg interactive-enhanced"
                 >
-                  Go to Dashboard
+                  <HomeIcon className="w-4 h-4" />
+                  <span>Go to Dashboard</span>
                 </button>
                 <button
                   onClick={this.reportError}
-                  className="flex-1 bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors"
+                  className="flex items-center justify-center space-x-2 bg-warning-600 text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-warning-700 focus:outline-none focus:ring-2 focus:ring-warning-500 focus:ring-offset-2 transition-all duration-200 hover:shadow-lg interactive-enhanced"
                 >
-                  Report Error
+                  <DocumentDuplicateIcon className="w-4 h-4" />
+                  <span>Report Error</span>
                 </button>
               </div>
             </div>
 
-            {/* Help Text */}
-            <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500">
-                If this problem persists, please use the "Report Error" button
-                to get help.
+            {/* Enhanced Help Text */}
+            <div className="mt-6 text-center bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800 rounded-lg p-4">
+              <p className="text-sm text-info-700 dark:text-info-300">
+                If this problem persists, please use the{" "}
+                <span className="font-semibold">"Report Error"</span> button to
+                get help from our support team.
               </p>
             </div>
           </div>

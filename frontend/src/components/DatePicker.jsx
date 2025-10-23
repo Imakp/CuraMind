@@ -1,126 +1,174 @@
-import { useState } from 'react'
+import { useState } from "react";
+import { CalendarIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { HeroIcon } from "./ui/Icon";
+import Button from "./ui/Button";
 
-const DatePicker = ({ 
-  value = '', 
-  onChange, 
-  label = 'Date',
-  placeholder = 'Select date',
+const DatePicker = ({
+  value = "",
+  onChange,
+  label = "Date",
+  placeholder = "Select date",
   disabled = false,
   required = false,
-  error = '',
+  error = "",
   minDate = null,
-  maxDate = null
+  maxDate = null,
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   const formatDateForInput = (dateString) => {
-    if (!dateString) return ''
+    if (!dateString) return "";
     // Ensure the date is in YYYY-MM-DD format for input[type="date"]
-    const date = new Date(dateString)
-    if (isNaN(date.getTime())) return ''
-    return date.toISOString().split('T')[0]
-  }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "";
+    return date.toISOString().split("T")[0];
+  };
 
   const formatDateForDisplay = (dateString) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
-    if (isNaN(date.getTime())) return ''
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "";
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   const handleDateChange = (e) => {
-    const newDate = e.target.value
-    onChange(newDate)
-  }
+    const newDate = e.target.value;
+    onChange(newDate);
+  };
 
   const handleClear = () => {
-    onChange('')
-  }
+    onChange("");
+  };
 
   const setToday = () => {
-    const today = new Date().toISOString().split('T')[0]
-    onChange(today)
-  }
+    const today = new Date().toISOString().split("T")[0];
+    onChange(today);
+  };
 
-  const inputValue = formatDateForInput(value)
-  const displayValue = formatDateForDisplay(value)
+  const inputValue = formatDateForInput(value);
+  const displayValue = formatDateForDisplay(value);
 
   return (
-    <div className="space-y-1">
+    <div className="form-field">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="form-label">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="form-label-required">*</span>}
         </label>
       )}
-      
+
       <div className="relative">
-        <div className="flex gap-2">
-          <input
-            type="date"
-            value={inputValue}
-            onChange={handleDateChange}
-            disabled={disabled}
-            min={minDate ? formatDateForInput(minDate) : undefined}
-            max={maxDate ? formatDateForInput(maxDate) : undefined}
-            className={`flex-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 ${
-              error ? 'border-red-300' : 'border-gray-300'
-            }`}
-            placeholder={placeholder}
-          />
-          
-          {/* Quick action buttons */}
-          <button
+        {/* Enhanced input container with better mobile experience */}
+        <div className="form-input-container">
+          <div className="relative flex-1">
+            <input
+              type="date"
+              value={inputValue}
+              onChange={handleDateChange}
+              disabled={disabled}
+              min={minDate ? formatDateForInput(minDate) : undefined}
+              max={maxDate ? formatDateForInput(maxDate) : undefined}
+              className={`form-input-base form-input-md w-full pl-12 ${
+                error ? "form-input-error" : ""
+              }`}
+              placeholder={placeholder}
+              aria-describedby={error ? `${label}-error` : undefined}
+            />
+
+            {/* Calendar icon */}
+            <div className="form-input-icon form-input-icon-left">
+              <HeroIcon
+                icon={CalendarIcon}
+                size="md"
+                className="text-neutral-400"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Enhanced quick action buttons with better mobile touch targets */}
+        <div className="flex gap-2 mt-3">
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={setToday}
             disabled={disabled}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className="flex-1 sm:flex-none"
           >
             Today
-          </button>
-          
+          </Button>
+
           {value && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={handleClear}
               disabled={disabled}
-              className="px-3 py-2 text-sm border border-gray-300 rounded-md text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
+              className="flex-1 sm:flex-none text-error-600 hover:text-error-700 hover:bg-error-50"
             >
+              <HeroIcon icon={XMarkIcon} size="sm" className="mr-1" />
               Clear
-            </button>
+            </Button>
           )}
         </div>
-        
-        {/* Display formatted date */}
-        {displayValue && (
-          <p className="mt-1 text-sm text-gray-600">
-            Selected: {displayValue}
-          </p>
-        )}
-      </div>
-      
-      {error && (
-        <p className="text-sm text-red-600">{error}</p>
-      )}
-      
-      {/* Helper text */}
-      <div className="text-xs text-gray-500">
-        {minDate && maxDate && (
-          <span>Date must be between {formatDateForDisplay(minDate)} and {formatDateForDisplay(maxDate)}</span>
-        )}
-        {minDate && !maxDate && (
-          <span>Date must be on or after {formatDateForDisplay(minDate)}</span>
-        )}
-        {!minDate && maxDate && (
-          <span>Date must be on or before {formatDateForDisplay(maxDate)}</span>
-        )}
-      </div>
-    </div>
-  )
-}
 
-export default DatePicker
+        {/* Enhanced display formatted date with better visual treatment */}
+        {displayValue && (
+          <div className="mt-3 p-3 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg">
+            <div className="flex items-center space-x-2">
+              <HeroIcon
+                icon={CalendarIcon}
+                size="sm"
+                className="text-primary-600 dark:text-primary-400"
+              />
+              <p className="text-sm font-medium text-primary-700 dark:text-primary-300">
+                Selected: {displayValue}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {error && (
+        <div className="form-message form-error" id={`${label}-error`}>
+          <HeroIcon
+            icon={XMarkIcon}
+            size="sm"
+            className="text-error-600 flex-shrink-0"
+          />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Enhanced helper text with better typography */}
+      {(minDate || maxDate) && (
+        <div className="form-help">
+          {minDate && maxDate && (
+            <span>
+              Date must be between {formatDateForDisplay(minDate)} and{" "}
+              {formatDateForDisplay(maxDate)}
+            </span>
+          )}
+          {minDate && !maxDate && (
+            <span>
+              Date must be on or after {formatDateForDisplay(minDate)}
+            </span>
+          )}
+          {!minDate && maxDate && (
+            <span>
+              Date must be on or before {formatDateForDisplay(maxDate)}
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DatePicker;

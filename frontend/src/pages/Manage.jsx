@@ -3,6 +3,23 @@ import SearchFilter from "../components/SearchFilter";
 import MedicationCard from "../components/MedicationCard";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
+import SummaryCard from "../components/ui/SummaryCard";
+import { HeroIcon } from "../components/ui/Icon";
+import { ManageSkeleton } from "../components/LoadingSkeleton";
+import {
+  SummaryCardStagger,
+  MedicationCardStagger,
+} from "../components/StaggerContainer";
+import {
+  BeakerIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  XCircleIcon,
+  PlusIcon,
+  ArrowLeftIcon,
+  FunnelIcon,
+  Bars3BottomLeftIcon,
+} from "@heroicons/react/24/outline";
 
 const Manage = () => {
   const [medications, setMedications] = useState([]);
@@ -286,233 +303,246 @@ const Manage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner />
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+        <header className="bg-gradient-to-r from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 shadow-sm border-b border-neutral-200 dark:border-neutral-700">
+          <div className="layout-container py-8">
+            <ManageSkeleton />
+          </div>
+        </header>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+      {/* Enhanced Header */}
+      <header className="bg-gradient-to-r from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 shadow-sm border-b border-neutral-200 dark:border-neutral-700">
+        <div className="layout-container py-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-heading-2 text-neutral-900 dark:text-neutral-100 mb-2">
                 Manage Medications
               </h1>
-              <p className="mt-1 text-sm text-gray-600">
+              <p className="text-lg text-neutral-600 dark:text-neutral-400">
                 {filteredMedications.length} of {medications.length} medications
+                {searchValue && ` matching "${searchValue}"`}
               </p>
             </div>
 
-            <div className="mt-4 sm:mt-0 sm:ml-4">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => (window.location.href = "/")}
+                className="btn-base btn-ghost btn-md lg:hidden"
+              >
+                <HeroIcon icon={ArrowLeftIcon} size="sm" />
+                Dashboard
+              </button>
+
               <button
                 onClick={() => (window.location.href = "/manage/new")}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="btn-base btn-primary btn-md"
               >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
+                <HeroIcon icon={PlusIcon} size="sm" />
                 Add Medication
               </button>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="layout-container py-8">
         {error && (
           <div className="mb-6">
             <ErrorMessage message={error} />
           </div>
         )}
 
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <SearchFilter
-            onSearch={handleSearch}
-            onFilter={handleFilter}
-            onSort={handleSort}
-            placeholder="Search by name, strength, or notes..."
-            searchValue={searchValue}
-            filters={filterOptions}
-            sortOptions={sortOptions}
-            selectedFilters={selectedFilters}
-            selectedSort={selectedSort}
-          />
-        </div>
-
-        {/* Medications List */}
-        {filteredMedications.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredMedications.map((medication) => (
-              <div key={medication.id} className="relative">
-                <MedicationCard
-                  medication={{
-                    ...medication,
-                    dailyConsumption:
-                      medication.doses?.reduce(
-                        (sum, dose) => sum + parseFloat(dose.dose_amount || 0),
-                        0
-                      ) || 0,
-                  }}
-                  showActions={true}
-                  onEdit={() =>
-                    (window.location.href = `/manage/${medication.id}`)
-                  }
-                  onDelete={() => handleDeleteMedication(medication.id)}
-                  onUpdateInventory={() => handleUpdateInventory(medication.id)}
-                />
-
-                {/* Status Badge */}
-                <div className="absolute top-2 right-2">
-                  {getMedicationStatus(medication) === "inactive" ? (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                      Inactive
-                    </span>
-                  ) : isLowInventory(medication) ? (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      Low Stock
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      Active
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+        {/* Enhanced Quick Stats with Stagger Animation */}
+        {medications.length > 0 && (
+          <section className="mb-8">
+            <SummaryCardStagger>
+              <SummaryCard
+                title="Total"
+                value={medications.length}
+                icon={<HeroIcon icon={BeakerIcon} size="lg" />}
+                color="primary"
+                variant="filled"
               />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              {searchValue || Object.keys(selectedFilters).length > 0
-                ? "No medications found"
-                : "No medications yet"}
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {searchValue || Object.keys(selectedFilters).length > 0
-                ? "Try adjusting your search or filters."
-                : "Get started by adding your first medication."}
-            </p>
-            {!searchValue && Object.keys(selectedFilters).length === 0 && (
-              <div className="mt-6">
-                <button
-                  onClick={() => (window.location.href = "/manage/new")}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  <svg
-                    className="w-4 h-4 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  Add Your First Medication
-                </button>
-              </div>
-            )}
-          </div>
+              <SummaryCard
+                title="Active"
+                value={
+                  medications.filter(
+                    (med) => getMedicationStatus(med) === "active"
+                  ).length
+                }
+                icon={<HeroIcon icon={CheckCircleIcon} size="lg" />}
+                color="success"
+                variant="filled"
+              />
+              <SummaryCard
+                title="Low Stock"
+                value={medications.filter((med) => isLowInventory(med)).length}
+                icon={<HeroIcon icon={ExclamationTriangleIcon} size="lg" />}
+                color="warning"
+                variant="filled"
+              />
+              <SummaryCard
+                title="Inactive"
+                value={
+                  medications.filter(
+                    (med) => getMedicationStatus(med) === "inactive"
+                  ).length
+                }
+                icon={<HeroIcon icon={XCircleIcon} size="lg" />}
+                color="neutral"
+                variant="filled"
+              />
+            </SummaryCardStagger>
+          </section>
         )}
 
-        {/* Quick Stats */}
-        {medications.length > 0 && (
-          <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Quick Stats
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {medications.length}
-                </div>
-                <div className="text-sm text-gray-600">Total Medications</div>
+        {/* Enhanced Search and Filters */}
+        <section className="mb-8">
+          <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex-shrink-0 w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
+                <HeroIcon icon={FunnelIcon} size="lg" color="primary" />
               </div>
-
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {
-                    medications.filter(
-                      (med) => getMedicationStatus(med) === "active"
-                    ).length
-                  }
-                </div>
-                <div className="text-sm text-gray-600">Active</div>
-              </div>
-
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">
-                  {medications.filter((med) => isLowInventory(med)).length}
-                </div>
-                <div className="text-sm text-gray-600">Low Inventory</div>
-              </div>
-
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-600">
-                  {
-                    medications.filter(
-                      (med) => getMedicationStatus(med) === "inactive"
-                    ).length
-                  }
-                </div>
-                <div className="text-sm text-gray-600">Inactive</div>
+              <div>
+                <h2 className="text-heading-4 text-neutral-900 dark:text-neutral-100">
+                  Search & Filter
+                </h2>
+                <p className="text-body-small text-neutral-600 dark:text-neutral-400">
+                  Find and organize your medications
+                </p>
               </div>
             </div>
-          </div>
-        )}
-      </div>
 
-      {/* Back to Dashboard Button */}
-      <div className="fixed bottom-6 left-6">
+            <SearchFilter
+              onSearch={handleSearch}
+              onFilter={handleFilter}
+              onSort={handleSort}
+              placeholder="Search by name, strength, or notes..."
+              searchValue={searchValue}
+              filters={filterOptions}
+              sortOptions={sortOptions}
+              selectedFilters={selectedFilters}
+              selectedSort={selectedSort}
+            />
+          </div>
+        </section>
+
+        {/* Enhanced Medications List */}
+        <section>
+          {filteredMedications.length > 0 ? (
+            <>
+              {/* Results Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <HeroIcon
+                    icon={Bars3BottomLeftIcon}
+                    size="lg"
+                    color="primary"
+                  />
+                  <div>
+                    <h2 className="text-heading-4 text-neutral-900 dark:text-neutral-100">
+                      Medications
+                    </h2>
+                    <p className="text-body-small text-neutral-600 dark:text-neutral-400">
+                      {filteredMedications.length} result
+                      {filteredMedications.length !== 1 ? "s" : ""}
+                      {selectedSort &&
+                        ` • Sorted by ${
+                          sortOptions.find((opt) => opt.value === selectedSort)
+                            ?.label
+                        }`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Enhanced Grid Layout with Stagger Animation */}
+              <MedicationCardStagger>
+                {filteredMedications.map((medication) => (
+                  <div key={medication.id} className="relative">
+                    <MedicationCard
+                      medication={{
+                        ...medication,
+                        dailyConsumption:
+                          medication.doses?.reduce(
+                            (sum, dose) =>
+                              sum + parseFloat(dose.dose_amount || 0),
+                            0
+                          ) || 0,
+                      }}
+                      showActions={true}
+                      onEdit={() =>
+                        (window.location.href = `/manage/edit/${medication.id}`)
+                      }
+                      onDelete={() => handleDeleteMedication(medication.id)}
+                      onUpdateInventory={() =>
+                        handleUpdateInventory(medication.id)
+                      }
+                    />
+
+                    {/* Enhanced Status Badge */}
+                    <div className="absolute top-3 right-3">
+                      {getMedicationStatus(medication) === "inactive" ? (
+                        <span className="badge-base badge-neutral badge-filled badge-sm">
+                          Inactive
+                        </span>
+                      ) : isLowInventory(medication) ? (
+                        <span className="badge-base badge-warning badge-filled badge-sm">
+                          Low Stock
+                        </span>
+                      ) : (
+                        <span className="badge-base badge-success badge-filled badge-sm">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </MedicationCardStagger>
+            </>
+          ) : (
+            /* Enhanced Empty State */
+            <div className="text-center py-16">
+              <div className="w-20 h-20 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                <HeroIcon icon={BeakerIcon} size="2xl" color="muted" />
+              </div>
+              <h3 className="text-heading-4 text-neutral-900 dark:text-neutral-100 mb-2">
+                {searchValue || Object.keys(selectedFilters).length > 0
+                  ? "No medications found"
+                  : "No medications yet"}
+              </h3>
+              <p className="text-body text-neutral-600 dark:text-neutral-400 mb-6 max-w-md mx-auto">
+                {searchValue || Object.keys(selectedFilters).length > 0
+                  ? "Try adjusting your search terms or filters to find what you're looking for."
+                  : "Get started by adding your first medication to begin tracking your health."}
+              </p>
+              {!searchValue && Object.keys(selectedFilters).length === 0 && (
+                <button
+                  onClick={() => (window.location.href = "/manage/new")}
+                  className="btn-base btn-primary btn-md"
+                >
+                  <HeroIcon icon={PlusIcon} size="sm" />
+                  Add Your First Medication
+                </button>
+              )}
+            </div>
+          )}
+        </section>
+      </main>
+
+      {/* Enhanced Back to Dashboard Button */}
+      <div className="fixed bottom-6 left-6 hidden lg:block">
         <button
           onClick={() => (window.location.href = "/")}
-          className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-full p-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          className="w-12 h-12 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 rounded-full shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 flex items-center justify-center"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
+          <HeroIcon icon={ArrowLeftIcon} size="lg" />
         </button>
       </div>
     </div>
